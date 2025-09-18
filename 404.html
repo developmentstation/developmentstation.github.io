@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Development Station - Professional Developer Tools</title>
+    <script>
+        // GitHub Pages SPA redirect handling
+        // This script redirects 404 errors to the main app with the path preserved
+        (function() {
+            var redirect = sessionStorage.redirect;
+            delete sessionStorage.redirect;
+            if (redirect && redirect !== location.href) {
+                history.replaceState(null, null, redirect);
+            }
+        })();
+        
+        // Store the path for SPA routing
+        var path = window.location.pathname;
+        if (path && path !== '/') {
+            // Store the path in session storage for the main app to pick up
+            sessionStorage.redirect = window.location.href;
+        }
+        
+        // Redirect to main app
+        window.location.replace('/' + window.location.search + window.location.hash);
+    </script>
+</head>
+<body>
+    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: system-ui, -apple-system, sans-serif;">
+        <div style="text-align: center;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🛠️</div>
+            <h1>Development Station</h1>
+            <p>Redirecting to app...</p>
+        </div>
+    </div>
+</body>
+</html>
