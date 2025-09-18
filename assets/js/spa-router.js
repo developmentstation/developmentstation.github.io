@@ -508,4 +508,9 @@ class SPARouter {
 }
 
 // Initialize router
-window.SPARouter = new SPARouter();
+try {
+  window.SPARouter = new SPARouter();
+  console.log('SPARouter initialized successfully');
+} catch (error) {
+  console.error('Failed to initialize SPARouter:', error);
+}

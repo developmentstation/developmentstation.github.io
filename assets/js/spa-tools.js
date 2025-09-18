@@ -481,4 +481,9 @@ window.SPATools = {
 };
 
 // Initialize tools
-window.SPATools.init();
+try {
+  window.SPATools.init();
+  console.log('SPATools initialized successfully');
+} catch (error) {
+  console.error('Failed to initialize SPATools:', error);
+}

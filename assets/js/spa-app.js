@@ -67,10 +67,16 @@ class SPAApp {
     
     while (!window.SPARouter || !window.SPAComponents || !window.SPATools) {
       if (Date.now() - startTime > maxWait) {
+        console.error('Missing dependencies:', {
+          SPARouter: !!window.SPARouter,
+          SPAComponents: !!window.SPAComponents,
+          SPATools: !!window.SPATools
+        });
         throw new Error('Dependencies failed to load within timeout');
       }
       await new Promise(resolve => setTimeout(resolve, 100));
     }
+    console.log('All dependencies loaded successfully');
   }
 
   showLoadingScreen() {
@@ -404,7 +410,12 @@ class SPAApp {
 }
 
 // Initialize the SPA application
-window.SPAApp = new SPAApp();
+try {
+  window.SPAApp = new SPAApp();
+  console.log('SPAApp initialized successfully');
+} catch (error) {
+  console.error('Failed to initialize SPAApp:', error);
+}
 
 // Export for global access
 window.addEventListener('spa-app-ready', (e) => {

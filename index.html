@@ -193,10 +193,81 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="assets/js/modern-shared.js"></script>
-    <script src="assets/js/spa-router.js"></script>
-    <script src="assets/js/spa-components.js"></script>
-    <script src="assets/js/spa-tools.js"></script>
-    <script src="assets/js/spa-app.js"></script>
+    <script>
+        // Error boundary for SPA loading
+        window.addEventListener('error', function(e) {
+            console.error('Script error:', e.error);
+            if (e.error && e.error.message && e.error.message.includes('SPA')) {
+                document.getElementById('main-content').innerHTML = `
+                    <div class="container">
+                        <div class="error-container text-center" style="padding: 4rem 2rem;">
+                            <div style="font-size: 4rem; margin-bottom: 2rem;">⚠️</div>
+                            <h2>Loading Error</h2>
+                            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                                Sorry, there was an error loading the application. This might be due to:
+                            </p>
+                            <ul style="text-align: left; max-width: 400px; margin: 0 auto 2rem; color: var(--text-secondary);">
+                                <li>Network connection issues</li>
+                                <li>JavaScript being disabled</li>
+                                <li>Browser compatibility</li>
+                            </ul>
+                            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                                <button class="btn btn-primary" onclick="location.reload()">Reload Page</button>
+                                <a href="tools/json-formatter.html" class="btn btn-outline">Use Legacy Tools</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                // Hide loading screen
+                const loadingScreen = document.getElementById('loading-screen');
+                if (loadingScreen) loadingScreen.style.display = 'none';
+            }
+        });
+
+        // Fallback timeout - if SPA doesn't load in 10 seconds
+        setTimeout(function() {
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
+                console.warn('SPA loading timeout - showing fallback');
+                loadingScreen.style.display = 'none';
+                document.getElementById('main-content').innerHTML = `
+                    <div class="container">
+                        <div class="error-container text-center" style="padding: 4rem 2rem;">
+                            <div style="font-size: 4rem; margin-bottom: 2rem;">⏰</div>
+                            <h2>Loading Timeout</h2>
+                            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                                The application is taking longer than expected to load.
+                            </p>
+                            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                                <button class="btn btn-primary" onclick="location.reload()">Try Again</button>
+                                <a href="tools/json-formatter.html" class="btn btn-outline">Use Legacy Tools</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }, 10000);
+    </script>
+    <script>
+        // Debug logging
+        console.log('Starting to load Development Station SPA...');
+        window.SPADebug = true;
+    </script>
+        <script src="assets/js/modern-shared.js?v=1.0.2" onerror="console.error('Failed to load modern-shared.js')"></script>
+        <script src="assets/js/spa-router.js?v=1.0.2" onerror="console.error('Failed to load spa-router.js')"></script>
+        <script src="assets/js/spa-components-new.js?v=1.0.2" onerror="console.error('Failed to load spa-components-new.js')"></script>
+        <script src="assets/js/spa-tools.js?v=1.0.2" onerror="console.error('Failed to load spa-tools.js')"></script>
+        <script src="assets/js/spa-app.js?v=1.0.2" onerror="console.error('Failed to load spa-app.js')"></script>
+    <script>
+        // Final initialization check
+        setTimeout(() => {
+            console.log('Initialization status:', {
+                SPARouter: !!window.SPARouter,
+                SPAComponents: !!window.SPAComponents,
+                SPATools: !!window.SPATools,
+                SPAApp: !!window.SPAApp
+            });
+        }, 1000);
+    </script>
 </body>
 </html>
