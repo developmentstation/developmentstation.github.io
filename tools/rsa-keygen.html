@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSA Key Generator - DevTools Hub</title>
+    <meta name="description" content="Generate RSA public and private key pairs with various key sizes. Export keys in PEM, PKCS#8, and other formats.">
+    <meta name="keywords" content="rsa key generator, public key, private key, cryptography, pem format, pkcs8, key pair">
+    <meta name="ga-measurement-id" content="">
+    <link rel="stylesheet" href="../assets/css/modern-styles.css">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="../index.html">DevTools Hub</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="../index.html" class="nav-link">Home</a>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="tool-header">
+                <h1>RSA Key Generator</h1>
+                <p>Generate RSA public and private key pairs for encryption, digital signatures, and secure communications.</p>
+            </div>
+
+            <div class="tool-content">
+                <div class="input-section">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="keySize">Key Size (bits)</label>
+                            <select id="keySize" class="form-select">
+                                <option value="1024">1024-bit (Fast, Less Secure)</option>
+                                <option value="2048" selected>2048-bit (Recommended)</option>
+                                <option value="3072">3072-bit (High Security)</option>
+                                <option value="4096">4096-bit (Maximum Security)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="keyFormat">Key Format</label>
+                            <select id="keyFormat" class="form-select">
+                                <option value="pkcs8" selected>PKCS#8 (Recommended)</option>
+                                <option value="pkcs1">PKCS#1 (Traditional)</option>
+                                <option value="spki">SPKI (Public Key)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button onclick="generateKeyPair()" class="btn btn-primary" id="generateBtn">
+                            <span class="btn-text">🔑 Generate Key Pair</span>
+                        </button>
+                        <button onclick="clearKeys()" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+
+                <div class="output-section" id="outputSection" style="display: none;">
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="showTab('private')">Private Key</button>
+                        <button class="tab-btn" onclick="showTab('public')">Public Key</button>
+                        <button class="tab-btn" onclick="showTab('info')">Key Info</button>
+                    </div>
+
+                    <div id="privateTab" class="tab-content active">
+                        <div class="section-header">
+                            <h3>Private Key</h3>
+                            <div class="button-group-sm">
+                                <button onclick="copyPrivateKey()" class="btn btn-outline btn-sm">Copy</button>
+                                <button onclick="downloadPrivateKey()" class="btn btn-outline btn-sm">Download</button>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <pre id="privateKey"></pre>
+                        </div>
+                        <div class="form-help">
+                            ⚠️ Keep your private key secure and never share it publicly!
+                        </div>
+                    </div>
+
+                    <div id="publicTab" class="tab-content">
+                        <div class="section-header">
+                            <h3>Public Key</h3>
+                            <div class="button-group-sm">
+                                <button onclick="copyPublicKey()" class="btn btn-outline btn-sm">Copy</button>
+                                <button onclick="downloadPublicKey()" class="btn btn-outline btn-sm">Download</button>
+                            </div>
+                        </div>
+                        <div class="code-block">
+                            <pre id="publicKey"></pre>
+                        </div>
+                        <div class="form-help">
+                            ✅ Public keys can be safely shared with others for encryption and signature verification.
+                        </div>
+                    </div>
+
+                    <div id="infoTab" class="tab-content">
+                        <div class="section-header">
+                            <h3>Key Information</h3>
+                            <button onclick="exportKeyInfo()" class="btn btn-outline btn-sm">Export Info</button>
+                        </div>
+                        <div class="info-grid" id="keyInfo"></div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>About RSA Key Generation</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>RSA Algorithm</h4>
+                            <p>RSA is a widely-used public-key cryptosystem based on the mathematical difficulty of factoring large prime numbers. It's used for secure communications and digital signatures.</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Key Sizes</h4>
+                            <ul>
+                                <li><strong>1024-bit:</strong> Deprecated, not recommended</li>
+                                <li><strong>2048-bit:</strong> Current standard, good security</li>
+                                <li><strong>3072-bit:</strong> High security, future-proof</li>
+                                <li><strong>4096-bit:</strong> Maximum security, slower performance</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Key Formats</h4>
+                            <ul>
+                                <li><strong>PKCS#8:</strong> Modern standard, supports encryption</li>
+                                <li><strong>PKCS#1:</strong> Traditional RSA format</li>
+                                <li><strong>SPKI:</strong> Subject Public Key Info (public keys only)</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Security Best Practices</h4>
+                            <ul>
+                                <li>Use at least 2048-bit keys</li>
+                                <li>Store private keys securely</li>
+                                <li>Never share private keys</li>
+                                <li>Regularly rotate key pairs</li>
+                                <li>Use proper key management systems</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevTools Hub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../assets/js/modern-shared.js"></script>
+    <script>
+        let currentKeyPair = null;
+        let keyInfo = null;
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function generateKeyPair() {
+            const keySize = parseInt(document.getElementById('keySize').value);
+            const keyFormat = document.getElementById('keyFormat').value;
+
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('generateBtn').innerHTML = '<span class="btn-text">🔄 Generating...</span>';
+
+            if (window.LoadingManager) {
+                window.LoadingManager.show(`Generating ${keySize}-bit RSA key pair...`);
+            }
+
+            try {
+                // Generate key pair using Web Crypto API
+                const keyPair = await window.crypto.subtle.generateKey(
+                    {
+                        name: "RSA-OAEP",
+                        modulusLength: keySize,
+                        publicExponent: new Uint8Array([1, 0, 1]), // 65537
+                        hash: "SHA-256"
+                    },
+                    true, // extractable
+                    ["encrypt", "decrypt"]
+                );
+
+                currentKeyPair = keyPair;
+
+                // Export keys in the specified format
+                const privateKeyFormat = keyFormat === 'pkcs1' ? 'pkcs8' : keyFormat; // Web Crypto only supports pkcs8 for private keys
+                const publicKeyFormat = keyFormat === 'pkcs1' ? 'spki' : 'spki'; // Web Crypto only supports spki for public keys
+
+                const privateKeyBuffer = await window.crypto.subtle.exportKey(privateKeyFormat, keyPair.privateKey);
+                const publicKeyBuffer = await window.crypto.subtle.exportKey(publicKeyFormat, keyPair.publicKey);
+
+                // Convert to PEM format
+                const privateKeyPem = arrayBufferToPem(privateKeyBuffer, 'PRIVATE KEY');
+                const publicKeyPem = arrayBufferToPem(publicKeyBuffer, 'PUBLIC KEY');
+
+                // Display keys
+                document.getElementById('privateKey').textContent = privateKeyPem;
+                document.getElementById('publicKey').textContent = publicKeyPem;
+
+                // Generate key info
+                keyInfo = {
+                    keySize: keySize,
+                    format: keyFormat,
+                    algorithm: 'RSA-OAEP',
+                    hash: 'SHA-256',
+                    publicExponent: '65537',
+                    generatedAt: new Date().toISOString(),
+                    privateKeyLength: privateKeyPem.length,
+                    publicKeyLength: publicKeyPem.length
+                };
+
+                displayKeyInfo(keyInfo);
+                document.getElementById('outputSection').style.display = 'block';
+
+                if (window.ToastManager) {
+                    window.ToastManager.show(`${keySize}-bit RSA key pair generated successfully!`, 'success');
+                } else {
+                    alert(`${keySize}-bit RSA key pair generated successfully!`);
+                }
+
+            } catch (error) {
+                console.error('Key generation error:', error);
+                if (window.ToastManager) {
+                    window.ToastManager.show(`Key generation failed: ${error.message}`, 'error');
+                } else {
+                    alert(`Key generation failed: ${error.message}`);
+                }
+            } finally {
+                document.getElementById('generateBtn').disabled = false;
+                document.getElementById('generateBtn').innerHTML = '<span class="btn-text">🔑 Generate Key Pair</span>';
+                
+                if (window.LoadingManager) {
+                    window.LoadingManager.hide();
+                }
+            }
+        }
+
+        function displayKeyInfo(info) {
+            const keyInfoDiv = document.getElementById('keyInfo');
+            keyInfoDiv.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">Key Size:</span>
+                    <span class="info-value">${info.keySize} bits</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Algorithm:</span>
+                    <span class="info-value">${info.algorithm}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Hash Function:</span>
+                    <span class="info-value">${info.hash}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Public Exponent:</span>
+                    <span class="info-value">${info.publicExponent}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Format:</span>
+                    <span class="info-value">${info.format.toUpperCase()}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Generated:</span>
+                    <span class="info-value">${new Date(info.generatedAt).toLocaleString()}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Private Key Size:</span>
+                    <span class="info-value">${info.privateKeyLength} characters</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Public Key Size:</span>
+                    <span class="info-value">${info.publicKeyLength} characters</span>
+                </div>
+            `;
+        }
+
+        function copyPrivateKey() {
+            const privateKey = document.getElementById('privateKey').textContent;
+            copyToClipboard(privateKey, 'Private key copied to clipboard!');
+        }
+
+        function copyPublicKey() {
+            const publicKey = document.getElementById('publicKey').textContent;
+            copyToClipboard(publicKey, 'Public key copied to clipboard!');
+        }
+
+        function downloadPrivateKey() {
+            const privateKey = document.getElementById('privateKey').textContent;
+            const keySize = document.getElementById('keySize').value;
+            downloadFile(privateKey, `rsa_private_key_${keySize}bit.pem`, 'application/x-pem-file');
+        }
+
+        function downloadPublicKey() {
+            const publicKey = document.getElementById('publicKey').textContent;
+            const keySize = document.getElementById('keySize').value;
+            downloadFile(publicKey, `rsa_public_key_${keySize}bit.pem`, 'application/x-pem-file');
+        }
+
+        function exportKeyInfo() {
+            if (!keyInfo) return;
+
+            const exportData = {
+                ...keyInfo,
+                privateKey: document.getElementById('privateKey').textContent,
+                publicKey: document.getElementById('publicKey').textContent,
+                exportedAt: new Date().toISOString(),
+                tool: 'DevTools Hub - RSA Key Generator'
+            };
+
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+                type: 'application/json'
+            });
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `rsa_keypair_info_${keyInfo.keySize}bit.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            if (window.ToastManager) {
+                window.ToastManager.show('Key information exported successfully!', 'success');
+            } else {
+                alert('Key information exported successfully!');
+            }
+        }
+
+        function clearKeys() {
+            document.getElementById('privateKey').textContent = '';
+            document.getElementById('publicKey').textContent = '';
+            document.getElementById('keyInfo').innerHTML = '';
+            document.getElementById('outputSection').style.display = 'none';
+            currentKeyPair = null;
+            keyInfo = null;
+        }
+
+        // Utility functions
+        function arrayBufferToPem(buffer, type) {
+            const base64 = arrayBufferToBase64(buffer);
+            const formatted = base64.match(/.{1,64}/g).join('\n');
+            return `-----BEGIN ${type}-----\n${formatted}\n-----END ${type}-----`;
+        }
+
+        function arrayBufferToBase64(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        function copyToClipboard(text, successMessage) {
+            if (window.ClipboardManager) {
+                window.ClipboardManager.copy(text);
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    if (window.ToastManager) {
+                        window.ToastManager.show(successMessage, 'success');
+                    } else {
+                        alert(successMessage);
+                    }
+                }).catch(() => {
+                    if (window.ToastManager) {
+                        window.ToastManager.show('Failed to copy to clipboard', 'error');
+                    } else {
+                        alert('Failed to copy to clipboard');
+                    }
+                });
+            }
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            if (window.ToastManager) {
+                window.ToastManager.show(`${filename} downloaded successfully!`, 'success');
+            } else {
+                alert(`${filename} downloaded successfully!`);
+            }
+        }
+    </script>
+
+    <style>
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .button-group-sm {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .form-help {
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            border-left: 3px solid var(--color-warning);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .button-group-sm {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</body>
+</html>

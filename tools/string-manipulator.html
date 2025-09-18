@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>String Manipulator - DevTools Hub</title>
+  <meta name="description" content="Reverse, sort, shuffle lines, remove duplicates, add line numbers, and extract emails from text.">
+  <meta name="keywords" content="string tools, reverse lines, sort lines, shuffle, remove duplicates, add line numbers, extract emails">
+  <meta name="author" content="DevTools Hub">
+  <meta name="robots" content="index, follow">
+
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+</head>
+<body data-theme="light">
+  <header class="header"><div class="container"><div class="header-content"><div class="logo"><button class="btn btn-ghost" onclick="goBack()" aria-label="Go back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button><a href="../index.html" class="logo"><span class="logo-icon">🛠️</span><span>DevTools Hub</span></a></div><nav class="nav-links"><a href="../index.html" class="nav-link">Home</a><a href="#" class="nav-link active" onclick="filterTools('text')">Text Tools</a></nav><div class="header-actions"><div class="search-container"><input type="text" id="searchInput" placeholder="Search tools..." class="search-input"><svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button></div></div></div></header>
+
+  <div class="breadcrumb"><div class="container"><nav class="breadcrumb-nav" aria-label="Breadcrumb"></nav></div></div>
+
+  <main class="main">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-header"><div class="tool-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20H7l8-16h2L9 20z"/></svg></div><div class="tool-info"><h1>String Manipulator</h1><p class="tool-description">Operate on lines: reverse, sort, shuffle, dedupe, number, extract emails.</p></div></div>
+
+          <div class="card mb-6">
+            <div class="form-group"><label class="form-label" for="smInput">Input</label><textarea id="smInput" class="form-textarea" rows="12" placeholder="One item per line..."></textarea></div>
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="run('reverse')">Reverse lines</button>
+              <button class="btn btn-secondary" onclick="run('sortAsc')">Sort A→Z</button>
+              <button class="btn btn-secondary" onclick="run('sortDesc')">Sort Z→A</button>
+              <button class="btn btn-outline" onclick="run('shuffle')">Shuffle</button>
+              <button class="btn btn-outline" onclick="run('dedupe')">Remove duplicates</button>
+              <button class="btn btn-outline" onclick="run('number')">Add line numbers</button>
+              <button class="btn btn-outline" onclick="run('emails')">Extract emails</button>
+              <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg></div><div><h3 class="card-title">Output</h3></div></div>
+            <div class="result-area"><textarea id="smOut" class="form-textarea" rows="12" readonly placeholder="Result will appear here..."></textarea><button class="copy-btn" data-target="smOut">Copy</button></div>
+          </div>
+        </div>
+        <div class="tool-sidebar">
+          <div class="card"><div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><div><h3 class="card-title">Notes</h3></div></div>
+            <ul class="text-xs text-secondary" style="list-style:disc;padding-left:18px;">
+              <li>Sorting is case-insensitive.</li>
+              <li>Duplicate removal keeps first occurrence.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><div class="footer-content"><div class="footer-section"><h4>DevTools Hub</h4><p>Professional developer tools that work offline. Privacy‑focused and completely free.</p></div><div class="footer-section"><h4>Text Tools</h4><a href="string-manipulator.html">String Manipulator</a><a href="case-converter.html">Case Converter</a></div><div class="footer-section"><h4>Popular</h4><a href="../tools/json-formatter.html">JSON Formatter</a><a href="../tools/qr-generator.html">QR Generator</a><a href="../tools/password-generator.html">Password Generator</a></div><div class="footer-section"><h4>Features</h4><span>✓ Works Offline</span><span>✓ No Data Collection</span><span>✓ Mobile Friendly</span></div></div><div class="footer-bottom"><p>&copy; 2024 DevTools Hub. Built with ❤️ for developers.</p></div></div></footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    function lines(){ return (document.getElementById('smInput').value || '').split(/\n/); }
+    function setOut(arr){ document.getElementById('smOut').value = arr.join('\n'); }
+    function clearAll(){ document.getElementById('smInput').value=''; setOut([]); }
+
+    function run(type){
+      let arr = lines();
+      switch(type){
+        case 'reverse': arr = arr.reverse(); break;
+        case 'sortAsc': arr = arr.sort((a,b)=>a.localeCompare(b,undefined,{sensitivity:'base'})); break;
+        case 'sortDesc': arr = arr.sort((a,b)=>b.localeCompare(a,undefined,{sensitivity:'base'})); break;
+        case 'shuffle': arr = shuffle(arr); break;
+        case 'dedupe': arr = dedupe(arr); break;
+        case 'number': arr = arr.map((v,i)=>`${String(i+1).padStart(3,' ')}. ${v}`); break;
+        case 'emails': arr = extractEmails(arr.join('\n')); break;
+      }
+      setOut(arr);
+    }
+
+    function dedupe(arr){ const seen=new Set(); const out=[]; for(const v of arr){ if(!seen.has(v)){ seen.add(v); out.push(v); } } return out; }
+    function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+    function extractEmails(text){ const m=text.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g)||[]; return dedupe(m); }
+  </script>
+</body>
+</html>
+

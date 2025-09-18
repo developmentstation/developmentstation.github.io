@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unix Timestamp Converter - DevTools Hub</title>
+    <meta name="description" content="Convert Unix timestamps to human-readable dates and vice versa. Free online Unix timestamp converter tool with current time display.">
+    <meta name="keywords" content="unix timestamp, timestamp converter, epoch time, unix time, date converter, time converter">
+    <meta name="author" content="DevTools Hub">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Unix Timestamp Converter - DevTools Hub">
+    <meta property="og:description" content="Convert Unix timestamps to human-readable dates and vice versa">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://devtools-hub.com/tools/unix-timestamp-converter.html">
+    <meta property="og:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏰</text></svg>">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Unix Timestamp Converter - DevTools Hub">
+    <meta name="twitter:description" content="Convert Unix timestamps to human-readable dates and vice versa">
+    <meta name="twitter:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏰</text></svg>">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏰</text></svg>">
+    
+    <!-- Theme -->
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="color-scheme" content="light dark">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../assets/css/modern-styles.css">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Unix Timestamp Converter",
+        "description": "Convert Unix timestamps to human-readable dates and vice versa",
+        "url": "https://devtools-hub.com/tools/unix-timestamp-converter.html",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "featureList": [
+            "Unix timestamp to date conversion",
+            "Date to Unix timestamp conversion",
+            "Current timestamp display",
+            "Multiple date formats",
+            "Timezone support"
+        ]
+    }
+    </script>
+</head>
+<body data-theme="light">
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <a href="../index.html" class="logo">
+                        <span class="logo-icon">🛠️</span>
+                        <span>DevTools Hub</span>
+                    </a>
+                </div>
+                
+                <nav class="nav-links">
+                    <a href="../index.html" class="nav-link">Home</a>
+                    <a href="../tools/time-tools.html" class="nav-link">Time Tools</a>
+                    <a href="../tools/text-tools.html" class="nav-link">Text Tools</a>
+                    <a href="../tools/security-tools.html" class="nav-link">Security</a>
+                </nav>
+                
+                <div class="header-actions">
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+                        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.35-4.35"/>
+                        </svg>
+                    </div>
+                    
+                    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+                        <span id="themeIcon">🌙</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="container">
+            <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+                <!-- Breadcrumb will be populated by JavaScript -->
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="tool-layout">
+                <!-- Main Tool Content -->
+                <div class="tool-content">
+                    <!-- Tool Header -->
+                    <div class="tool-header">
+                        <div class="tool-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <h1>Unix Timestamp Converter</h1>
+                            <p class="tool-description">Convert Unix timestamps to human-readable dates and vice versa with support for multiple timezones.</p>
+                        </div>
+                    </div>
+
+                    <!-- Current Time Display -->
+                    <div class="card mb-6">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Current Time</h3>
+                                <p class="card-description">Live timestamp display</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label">Current Unix Timestamp</label>
+                                <div class="result-area">
+                                    <div class="result-content" id="currentTimestamp">Loading...</div>
+                                    <button class="copy-btn" data-target="currentTimestamp">Copy</button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Current Date & Time</label>
+                                <div class="result-area">
+                                    <div class="result-content" id="currentDateTime">Loading...</div>
+                                    <button class="copy-btn" data-target="currentDateTime">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timestamp to Date Converter -->
+                    <div class="card mb-6">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M16 18l6-6-6-6"/>
+                                    <path d="M8 6l-6 6 6 6"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Timestamp to Date</h3>
+                                <p class="card-description">Convert Unix timestamp to human-readable date</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="timestampInput" class="form-label">Unix Timestamp</label>
+                            <input type="text" id="timestampInput" placeholder="Enter Unix timestamp (e.g., 1640995200)" class="form-input" oninput="convertFromTimestamp()">
+                            <div class="flex gap-2 mt-2">
+                                <button onclick="useCurrentTimestamp()" class="btn btn-sm btn-outline">Use Current</button>
+                                <button onclick="clearTimestampInput()" class="btn btn-sm btn-ghost">Clear</button>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="timestampTimezone" class="form-label">Timezone</label>
+                                <select id="timestampTimezone" class="form-select" onchange="convertFromTimestamp()">
+                                    <option value="UTC">UTC</option>
+                                    <option value="America/New_York">Eastern (ET)</option>
+                                    <option value="America/Chicago">Central (CT)</option>
+                                    <option value="America/Denver">Mountain (MT)</option>
+                                    <option value="America/Los_Angeles">Pacific (PT)</option>
+                                    <option value="Europe/London">London</option>
+                                    <option value="Europe/Paris">Paris</option>
+                                    <option value="Asia/Tokyo">Tokyo</option>
+                                    <option value="Asia/Shanghai">Shanghai</option>
+                                    <option value="Australia/Sydney">Sydney</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="dateFormat" class="form-label">Date Format</label>
+                                <select id="dateFormat" class="form-select" onchange="convertFromTimestamp()">
+                                    <option value="iso">ISO 8601 (2024-01-01T12:00:00Z)</option>
+                                    <option value="locale">Locale String (1/1/2024, 12:00:00 PM)</option>
+                                    <option value="custom">Custom (Jan 1, 2024 12:00 PM)</option>
+                                    <option value="relative">Relative (2 hours ago)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="timestampResult" class="result-area hidden">
+                            <div class="result-content" id="timestampOutput"></div>
+                            <button class="copy-btn" data-target="timestampOutput">Copy</button>
+                        </div>
+                    </div>
+
+                    <!-- Date to Timestamp Converter -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M8 6l6 6-6 6"/>
+                                    <path d="M16 18l6-6-6-6"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Date to Timestamp</h3>
+                                <p class="card-description">Convert date and time to Unix timestamp</p>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dateInput" class="form-label">Date</label>
+                                <input type="date" id="dateInput" class="form-input" onchange="convertToTimestamp()">
+                            </div>
+                            <div class="form-group">
+                                <label for="timeInput" class="form-label">Time</label>
+                                <input type="time" id="timeInput" class="form-input" onchange="convertToTimestamp()">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dateTimezone" class="form-label">Timezone</label>
+                            <select id="dateTimezone" class="form-select" onchange="convertToTimestamp()">
+                                <option value="UTC">UTC</option>
+                                <option value="America/New_York">Eastern (ET)</option>
+                                <option value="America/Chicago">Central (CT)</option>
+                                <option value="America/Denver">Mountain (MT)</option>
+                                <option value="America/Los_Angeles">Pacific (PT)</option>
+                                <option value="Europe/London">London</option>
+                                <option value="Europe/Paris">Paris</option>
+                                <option value="Asia/Tokyo">Tokyo</option>
+                                <option value="Asia/Shanghai">Shanghai</option>
+                                <option value="Australia/Sydney">Sydney</option>
+                            </select>
+                        </div>
+
+                        <div class="btn-group">
+                            <button onclick="setCurrentDate()" class="btn btn-secondary">Use Current Date</button>
+                            <button onclick="clearDateInputs()" class="btn btn-outline">Clear</button>
+                        </div>
+
+                        <div id="dateResult" class="result-area hidden">
+                            <div class="result-content" id="dateOutput"></div>
+                            <button class="copy-btn" data-target="dateOutput">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="tool-sidebar">
+                    <!-- Quick Reference -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Quick Reference</h3>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <h5 class="font-semibold text-sm mb-2">What is Unix Timestamp?</h5>
+                                <p class="text-sm text-secondary">Number of seconds since January 1, 1970 00:00:00 UTC (Unix Epoch).</p>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold text-sm mb-2">Common Timestamps</h5>
+                                <div class="space-y-1 text-xs">
+                                    <div class="flex justify-between">
+                                        <span>Unix Epoch:</span>
+                                        <code>0</code>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Y2K:</span>
+                                        <code>946684800</code>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>2024-01-01:</span>
+                                        <code>1704067200</code>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h5 class="font-semibold text-sm mb-2">Formats Supported</h5>
+                                <ul class="text-xs text-secondary space-y-1">
+                                    <li>• Seconds (10 digits)</li>
+                                    <li>• Milliseconds (13 digits)</li>
+                                    <li>• Multiple timezones</li>
+                                    <li>• Various date formats</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Related Tools -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 11H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h4m6-6h4a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-4m-6 0V9a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-2"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Related Tools</h3>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <a href="world-clock.html" class="block p-3 rounded-lg hover:bg-secondary transition-colors">
+                                <div class="font-medium text-sm">World Clock</div>
+                                <div class="text-xs text-secondary">Multiple timezone display</div>
+                            </a>
+                            <a href="date-calculator.html" class="block p-3 rounded-lg hover:bg-secondary transition-colors">
+                                <div class="font-medium text-sm">Date Calculator</div>
+                                <div class="text-xs text-secondary">Calculate date differences</div>
+                            </a>
+                            <a href="countdown-timer.html" class="block p-3 rounded-lg hover:bg-secondary transition-colors">
+                                <div class="font-medium text-sm">Countdown Timer</div>
+                                <div class="text-xs text-secondary">Timer to specific date</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>DevTools Hub</h4>
+                    <p>Professional developer tools that work offline. Privacy-focused and completely free.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Time Tools</h4>
+                    <a href="unix-timestamp-converter.html">Unix Timestamp</a>
+                    <a href="world-clock.html">World Clock</a>
+                    <a href="date-calculator.html">Date Calculator</a>
+                    <a href="countdown-timer.html">Countdown Timer</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Popular Tools</h4>
+                    <a href="json-formatter.html">JSON Formatter</a>
+                    <a href="base64-encoder.html">Base64 Encoder</a>
+                    <a href="qr-code-generator.html">QR Code Generator</a>
+                    <a href="password-generator.html">Password Generator</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Features</h4>
+                    <span>✓ Works Offline</span>
+                    <span>✓ No Data Collection</span>
+                    <span>✓ Open Source</span>
+                    <span>✓ Mobile Friendly</span>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 DevTools Hub. Built with ❤️ for developers.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../assets/js/modern-shared.js"></script>
+    <script>
+        // Unix Timestamp Converter Logic
+        let currentTimeInterval;
+
+        // Initialize current time display
+        function updateCurrentTime() {
+            const now = new Date();
+            const timestamp = Math.floor(now.getTime() / 1000);
+            
+            document.getElementById('currentTimestamp').textContent = timestamp;
+            document.getElementById('currentDateTime').textContent = now.toISOString();
+        }
+
+        // Convert from Unix timestamp to date
+        function convertFromTimestamp() {
+            const input = document.getElementById('timestampInput').value.trim();
+            const timezone = document.getElementById('timestampTimezone').value;
+            const format = document.getElementById('dateFormat').value;
+            const resultDiv = document.getElementById('timestampResult');
+            const output = document.getElementById('timestampOutput');
+
+            if (!input) {
+                resultDiv.classList.add('hidden');
+                return;
+            }
+
+            try {
+                let timestamp = parseInt(input);
+                
+                // Handle milliseconds (13 digits) vs seconds (10 digits)
+                if (timestamp.toString().length === 13) {
+                    timestamp = Math.floor(timestamp / 1000);
+                }
+
+                const date = new Date(timestamp * 1000);
+                let formattedDate;
+
+                switch (format) {
+                    case 'iso':
+                        formattedDate = date.toISOString();
+                        break;
+                    case 'locale':
+                        formattedDate = date.toLocaleString('en-US', { 
+                            timeZone: timezone === 'UTC' ? 'UTC' : timezone 
+                        });
+                        break;
+                    case 'custom':
+                        formattedDate = date.toLocaleDateString('en-US', {
+                            timeZone: timezone === 'UTC' ? 'UTC' : timezone,
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            hour12: true
+                        });
+                        break;
+                    case 'relative':
+                        formattedDate = getRelativeTime(timestamp);
+                        break;
+                    default:
+                        formattedDate = date.toISOString();
+                }
+
+                output.textContent = formattedDate;
+                resultDiv.classList.remove('hidden');
+                
+            } catch (error) {
+                output.textContent = 'Invalid timestamp';
+                resultDiv.classList.remove('hidden');
+                ToastManager.error('Invalid timestamp format');
+            }
+        }
+
+        // Convert from date to Unix timestamp
+        function convertToTimestamp() {
+            const dateInput = document.getElementById('dateInput').value;
+            const timeInput = document.getElementById('timeInput').value;
+            const timezone = document.getElementById('dateTimezone').value;
+            const resultDiv = document.getElementById('dateResult');
+            const output = document.getElementById('dateOutput');
+
+            if (!dateInput) {
+                resultDiv.classList.add('hidden');
+                return;
+            }
+
+            try {
+                const dateTimeString = `${dateInput}${timeInput ? 'T' + timeInput : 'T00:00:00'}`;
+                let date;
+
+                if (timezone === 'UTC') {
+                    date = new Date(dateTimeString + 'Z');
+                } else {
+                    // For local timezone conversion
+                    date = new Date(dateTimeString);
+                }
+
+                const timestamp = Math.floor(date.getTime() / 1000);
+                output.textContent = timestamp;
+                resultDiv.classList.remove('hidden');
+
+            } catch (error) {
+                output.textContent = 'Invalid date';
+                resultDiv.classList.remove('hidden');
+                ToastManager.error('Invalid date format');
+            }
+        }
+
+        // Helper function for relative time
+        function getRelativeTime(timestamp) {
+            const now = Math.floor(Date.now() / 1000);
+            const diff = now - timestamp;
+            
+            if (diff < 60) return `${diff} seconds ago`;
+            if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+            if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
+            if (diff < 2592000) return `${Math.floor(diff / 604800)} weeks ago`;
+            if (diff < 31536000) return `${Math.floor(diff / 2592000)} months ago`;
+            return `${Math.floor(diff / 31536000)} years ago`;
+        }
+
+        // Utility functions
+        function useCurrentTimestamp() {
+            const timestamp = Math.floor(Date.now() / 1000);
+            document.getElementById('timestampInput').value = timestamp;
+            convertFromTimestamp();
+        }
+
+        function setCurrentDate() {
+            const now = new Date();
+            document.getElementById('dateInput').value = now.toISOString().split('T')[0];
+            document.getElementById('timeInput').value = now.toTimeString().slice(0, 5);
+            convertToTimestamp();
+        }
+
+        function clearTimestampInput() {
+            document.getElementById('timestampInput').value = '';
+            document.getElementById('timestampResult').classList.add('hidden');
+        }
+
+        function clearDateInputs() {
+            document.getElementById('dateInput').value = '';
+            document.getElementById('timeInput').value = '';
+            document.getElementById('dateResult').classList.add('hidden');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCurrentTime();
+            currentTimeInterval = setInterval(updateCurrentTime, 1000);
+            
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('dateInput').value = today;
+        });
+
+        // Cleanup interval when leaving page
+        window.addEventListener('beforeunload', () => {
+            if (currentTimeInterval) {
+                clearInterval(currentTimeInterval);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMAC Generator - DevTools Hub</title>
+    <meta name="description" content="Generate and verify HMAC (Hash-based Message Authentication Code) using SHA-1, SHA-256, SHA-384, and SHA-512 algorithms.">
+    <meta name="keywords" content="hmac generator, hmac verifier, message authentication, sha256, sha512, hash authentication code">
+    <meta name="ga-measurement-id" content="">
+    <link rel="stylesheet" href="../assets/css/modern-styles.css">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="../index.html">DevTools Hub</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="../index.html" class="nav-link">Home</a>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="tool-header">
+                <h1>HMAC Generator</h1>
+                <p>Generate and verify HMAC (Hash-based Message Authentication Code) for message integrity and authenticity verification.</p>
+            </div>
+
+            <div class="tool-content">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="showTab('generate')">Generate HMAC</button>
+                    <button class="tab-btn" onclick="showTab('verify')">Verify HMAC</button>
+                </div>
+
+                <div id="generateTab" class="tab-content active">
+                    <div class="input-section">
+                        <div class="form-group">
+                            <label for="messageInput">Message</label>
+                            <textarea id="messageInput" placeholder="Enter message to authenticate..." class="form-textarea" rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="secretKey">Secret Key</label>
+                            <input type="password" id="secretKey" placeholder="Enter secret key" class="form-input">
+                            <button type="button" class="toggle-password" onclick="togglePassword('secretKey')">👁️</button>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="algorithm">Hash Algorithm</label>
+                                <select id="algorithm" class="form-select">
+                                    <option value="SHA-1">SHA-1</option>
+                                    <option value="SHA-256" selected>SHA-256</option>
+                                    <option value="SHA-384">SHA-384</option>
+                                    <option value="SHA-512">SHA-512</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="outputFormat">Output Format</label>
+                                <select id="outputFormat" class="form-select">
+                                    <option value="hex" selected>Hexadecimal</option>
+                                    <option value="base64">Base64</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button onclick="generateHMAC()" class="btn btn-primary">
+                                <span class="btn-text">🔐 Generate HMAC</span>
+                            </button>
+                            <button onclick="generateRandomKey()" class="btn btn-outline">Generate Key</button>
+                            <button onclick="clearGenerate()" class="btn btn-secondary">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="output-section" id="generateOutput" style="display: none;">
+                        <div class="section-header">
+                            <h3>HMAC Result</h3>
+                            <button onclick="copyHMAC()" class="btn btn-outline btn-sm">Copy HMAC</button>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="result-label">HMAC:</div>
+                            <div class="result-value" id="hmacResult"></div>
+                        </div>
+
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Algorithm:</span>
+                                <span class="info-value" id="resultAlgorithm"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Message Length:</span>
+                                <span class="info-value" id="messageLength"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Key Length:</span>
+                                <span class="info-value" id="keyLength"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">HMAC Length:</span>
+                                <span class="info-value" id="hmacLength"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="verifyTab" class="tab-content">
+                    <div class="input-section">
+                        <div class="form-group">
+                            <label for="verifyMessage">Message</label>
+                            <textarea id="verifyMessage" placeholder="Enter original message..." class="form-textarea" rows="4"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="verifyKey">Secret Key</label>
+                            <input type="password" id="verifyKey" placeholder="Enter secret key" class="form-input">
+                            <button type="button" class="toggle-password" onclick="togglePassword('verifyKey')">👁️</button>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="expectedHMAC">Expected HMAC</label>
+                            <input type="text" id="expectedHMAC" placeholder="Enter HMAC to verify" class="form-input">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="verifyAlgorithm">Hash Algorithm</label>
+                                <select id="verifyAlgorithm" class="form-select">
+                                    <option value="SHA-1">SHA-1</option>
+                                    <option value="SHA-256" selected>SHA-256</option>
+                                    <option value="SHA-384">SHA-384</option>
+                                    <option value="SHA-512">SHA-512</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputFormat">HMAC Format</label>
+                                <select id="inputFormat" class="form-select">
+                                    <option value="hex" selected>Hexadecimal</option>
+                                    <option value="base64">Base64</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button onclick="verifyHMAC()" class="btn btn-primary">
+                                <span class="btn-text">✅ Verify HMAC</span>
+                            </button>
+                            <button onclick="clearVerify()" class="btn btn-secondary">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="output-section" id="verifyOutput" style="display: none;">
+                        <div class="section-header">
+                            <h3>Verification Result</h3>
+                        </div>
+                        
+                        <div class="verification-result" id="verificationResult"></div>
+
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Expected HMAC:</span>
+                                <span class="info-value" id="expectedHMACDisplay"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Calculated HMAC:</span>
+                                <span class="info-value" id="calculatedHMACDisplay"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Match Status:</span>
+                                <span class="info-value" id="matchStatus"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>About HMAC</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>What is HMAC?</h4>
+                            <p>HMAC (Hash-based Message Authentication Code) is a mechanism for message authentication using cryptographic hash functions combined with a secret key.</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Hash Algorithms</h4>
+                            <ul>
+                                <li><strong>SHA-1:</strong> 160-bit, legacy (not recommended)</li>
+                                <li><strong>SHA-256:</strong> 256-bit, widely used</li>
+                                <li><strong>SHA-384:</strong> 384-bit, high security</li>
+                                <li><strong>SHA-512:</strong> 512-bit, maximum security</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Use Cases</h4>
+                            <ul>
+                                <li>API authentication</li>
+                                <li>Message integrity verification</li>
+                                <li>Digital signatures</li>
+                                <li>Secure communication protocols</li>
+                                <li>Data authenticity validation</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Security Notes</h4>
+                            <ul>
+                                <li>Use strong, random secret keys</li>
+                                <li>Keep secret keys confidential</li>
+                                <li>Use timing-safe comparison for verification</li>
+                                <li>Consider key rotation policies</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevTools Hub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../assets/js/modern-shared.js"></script>
+    <script>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const button = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️';
+            }
+        }
+
+        async function generateHMAC() {
+            const message = document.getElementById('messageInput').value;
+            const secretKey = document.getElementById('secretKey').value;
+            const algorithm = document.getElementById('algorithm').value;
+            const outputFormat = document.getElementById('outputFormat').value;
+
+            if (!message.trim()) {
+                if (window.ToastManager) {
+                    window.ToastManager.show('Please enter a message', 'error');
+                } else {
+                    alert('Please enter a message');
+                }
+                return;
+            }
+
+            if (!secretKey) {
+                if (window.ToastManager) {
+                    window.ToastManager.show('Please enter a secret key', 'error');
+                } else {
+                    alert('Please enter a secret key');
+                }
+                return;
+            }
+
+            if (window.LoadingManager) {
+                window.LoadingManager.show('Generating HMAC...');
+            }
+
+            try {
+                const hmac = await calculateHMAC(message, secretKey, algorithm);
+                const formattedHMAC = outputFormat === 'base64' ? arrayBufferToBase64(hmac) : arrayBufferToHex(hmac);
+
+                // Display results
+                document.getElementById('hmacResult').textContent = formattedHMAC;
+                document.getElementById('resultAlgorithm').textContent = `HMAC-${algorithm}`;
+                document.getElementById('messageLength').textContent = `${message.length} characters`;
+                document.getElementById('keyLength').textContent = `${secretKey.length} characters`;
+                document.getElementById('hmacLength').textContent = `${formattedHMAC.length} characters`;
+
+                document.getElementById('generateOutput').style.display = 'block';
+
+                if (window.ToastManager) {
+                    window.ToastManager.show('HMAC generated successfully!', 'success');
+                } else {
+                    alert('HMAC generated successfully!');
+                }
+
+            } catch (error) {
+                console.error('HMAC generation error:', error);
+                if (window.ToastManager) {
+                    window.ToastManager.show(`HMAC generation failed: ${error.message}`, 'error');
+                } else {
+                    alert(`HMAC generation failed: ${error.message}`);
+                }
+            } finally {
+                if (window.LoadingManager) {
+                    window.LoadingManager.hide();
+                }
+            }
+        }
+
+        async function verifyHMAC() {
+            const message = document.getElementById('verifyMessage').value;
+            const secretKey = document.getElementById('verifyKey').value;
+            const expectedHMAC = document.getElementById('expectedHMAC').value.trim();
+            const algorithm = document.getElementById('verifyAlgorithm').value;
+            const inputFormat = document.getElementById('inputFormat').value;
+
+            if (!message.trim() || !secretKey || !expectedHMAC) {
+                if (window.ToastManager) {
+                    window.ToastManager.show('Please fill in all fields', 'error');
+                } else {
+                    alert('Please fill in all fields');
+                }
+                return;
+            }
+
+            if (window.LoadingManager) {
+                window.LoadingManager.show('Verifying HMAC...');
+            }
+
+            try {
+                const calculatedHMACBuffer = await calculateHMAC(message, secretKey, algorithm);
+                const calculatedHMAC = inputFormat === 'base64' 
+                    ? arrayBufferToBase64(calculatedHMACBuffer) 
+                    : arrayBufferToHex(calculatedHMACBuffer);
+
+                // Normalize expected HMAC format
+                const normalizedExpected = expectedHMAC.toLowerCase().replace(/[^a-f0-9]/g, '');
+                const normalizedCalculated = calculatedHMAC.toLowerCase().replace(/[^a-f0-9]/g, '');
+
+                const isMatch = timingSafeEqual(normalizedExpected, normalizedCalculated);
+
+                // Display results
+                document.getElementById('expectedHMACDisplay').textContent = expectedHMAC;
+                document.getElementById('calculatedHMACDisplay').textContent = calculatedHMAC;
+                document.getElementById('matchStatus').textContent = isMatch ? 'Valid ✅' : 'Invalid ❌';
+
+                const resultDiv = document.getElementById('verificationResult');
+                if (isMatch) {
+                    resultDiv.innerHTML = `
+                        <div class="verification-success">
+                            <div class="verification-icon">✅</div>
+                            <div class="verification-text">
+                                <h4>HMAC Verification Successful</h4>
+                                <p>The message is authentic and has not been tampered with.</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="verification-failure">
+                            <div class="verification-icon">❌</div>
+                            <div class="verification-text">
+                                <h4>HMAC Verification Failed</h4>
+                                <p>The message may have been tampered with or the key/algorithm is incorrect.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('verifyOutput').style.display = 'block';
+
+                if (window.ToastManager) {
+                    window.ToastManager.show(
+                        isMatch ? 'HMAC verification successful!' : 'HMAC verification failed!', 
+                        isMatch ? 'success' : 'error'
+                    );
+                } else {
+                    alert(isMatch ? 'HMAC verification successful!' : 'HMAC verification failed!');
+                }
+
+            } catch (error) {
+                console.error('HMAC verification error:', error);
+                if (window.ToastManager) {
+                    window.ToastManager.show(`HMAC verification failed: ${error.message}`, 'error');
+                } else {
+                    alert(`HMAC verification failed: ${error.message}`);
+                }
+            } finally {
+                if (window.LoadingManager) {
+                    window.LoadingManager.hide();
+                }
+            }
+        }
+
+        async function calculateHMAC(message, key, algorithm) {
+            const encoder = new TextEncoder();
+            const keyData = encoder.encode(key);
+            const messageData = encoder.encode(message);
+
+            const cryptoKey = await window.crypto.subtle.importKey(
+                'raw',
+                keyData,
+                { name: 'HMAC', hash: algorithm },
+                false,
+                ['sign']
+            );
+
+            return await window.crypto.subtle.sign('HMAC', cryptoKey, messageData);
+        }
+
+        function generateRandomKey() {
+            const keyLength = 32; // 256-bit key
+            const randomBytes = window.crypto.getRandomValues(new Uint8Array(keyLength));
+            const randomKey = arrayBufferToHex(randomBytes);
+            
+            document.getElementById('secretKey').value = randomKey;
+            
+            if (window.ToastManager) {
+                window.ToastManager.show('Random secret key generated', 'success');
+            } else {
+                alert('Random secret key generated');
+            }
+        }
+
+        function copyHMAC() {
+            const hmacResult = document.getElementById('hmacResult').textContent;
+
+            if (window.ClipboardManager) {
+                window.ClipboardManager.copy(hmacResult);
+            } else {
+                navigator.clipboard.writeText(hmacResult).then(() => {
+                    if (window.ToastManager) {
+                        window.ToastManager.show('HMAC copied to clipboard!', 'success');
+                    } else {
+                        alert('HMAC copied to clipboard!');
+                    }
+                }).catch(() => {
+                    if (window.ToastManager) {
+                        window.ToastManager.show('Failed to copy to clipboard', 'error');
+                    } else {
+                        alert('Failed to copy to clipboard');
+                    }
+                });
+            }
+        }
+
+        function clearGenerate() {
+            document.getElementById('messageInput').value = '';
+            document.getElementById('secretKey').value = '';
+            document.getElementById('generateOutput').style.display = 'none';
+        }
+
+        function clearVerify() {
+            document.getElementById('verifyMessage').value = '';
+            document.getElementById('verifyKey').value = '';
+            document.getElementById('expectedHMAC').value = '';
+            document.getElementById('verifyOutput').style.display = 'none';
+        }
+
+        // Utility functions
+        function arrayBufferToHex(buffer) {
+            return Array.from(new Uint8Array(buffer))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        function arrayBufferToBase64(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        function timingSafeEqual(a, b) {
+            if (a.length !== b.length) {
+                return false;
+            }
+            
+            let result = 0;
+            for (let i = 0; i < a.length; i++) {
+                result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+            }
+            
+            return result === 0;
+        }
+    </script>
+
+    <style>
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.25rem;
+            border-radius: 4px;
+            margin-top: 1.2rem;
+        }
+
+        .toggle-password:hover {
+            background: var(--bg-secondary);
+        }
+
+        .result-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            word-break: break-all;
+            background: var(--bg-primary);
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .verification-result {
+            margin-bottom: 1.5rem;
+        }
+
+        .verification-success,
+        .verification-failure {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid;
+        }
+
+        .verification-success {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .verification-failure {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .verification-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .verification-text h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .verification-text p {
+            margin: 0;
+            color: var(--text-secondary);
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            word-break: break-all;
+            max-width: 60%;
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .verification-success,
+            .verification-failure {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .info-value {
+                max-width: 50%;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</body>
+</html>

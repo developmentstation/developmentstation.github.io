@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JS Beautifier - DevTools Hub</title>
+  <meta name="description" content="Beautify JavaScript/JSON with configurable indentation and semicolons.">
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+  <meta name="color-scheme" content="light dark">
+  </head>
+<body data-theme="light">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <a href="../index.html" class="logo"><span class="logo-icon">🛠️</span><span>DevTools Hub</span></a>
+        </div>
+        <nav class="nav-links">
+          <a href="../index.html" class="nav-link">Home</a>
+          <a href="#" class="nav-link active">Formatters</a>
+        </nav>
+        <div class="header-actions">
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-header">
+            <div class="tool-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18h6M16 6h6M3 6h6M3 12h6M3 18h6"/></svg></div>
+            <div class="tool-info"><h1>JS Beautifier</h1><p class="tool-description">Reformat JavaScript/JSON for readability.</p></div>
+          </div>
+
+          <div class="card mb-6">
+            <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><div><h3 class="card-title">Options</h3></div></div>
+            <div class="grid" style="grid-template-columns: repeat(4, minmax(0,1fr)); gap: 1rem; padding:1rem;">
+              <div class="form-group"><label class="form-label">Indent</label><select id="indent" class="form-input"><option value="2">2 spaces</option><option value="4">4 spaces</option><option value="\t">Tab</option></select></div>
+              <div class="form-group"><label class="form-label">Semicolons</label><select id="semi" class="form-input"><option value="yes">Yes</option><option value="no">No</option></select></div>
+              <div class="form-group"><label class="form-label">Trailing comma</label><select id="trailing" class="form-input"><option value="no">No</option><option value="yes">Yes (where valid)</option></select></div>
+              <div class="form-group"><label class="form-label">Try JSON parse</label><select id="tryjson" class="form-input"><option value="yes">Yes</option><option value="no">No</option></select></div>
+            </div>
+            <div class="btn-group"><button class="btn btn-primary" onclick="run()">Beautify</button><button class="btn" onclick="copyOut()">Copy</button><button class="btn" onclick="downloadOut()">Download</button><button class="btn btn-ghost" onclick="clearAll()">Clear</button></div>
+          </div>
+
+          <div class="grid" style="grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem;">
+            <div class="card">
+              <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4"/><path d="M20 12H4"/><path d="M20 17H4"/></svg></div><div><h3 class="card-title">Input</h3></div></div>
+              <div class="form-group" style="padding:1rem"><textarea id="input" class="form-textarea" rows="14" placeholder="Paste JS or JSON..."></textarea></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg></div><div><h3 class="card-title">Output</h3></div></div>
+              <div class="form-group" style="padding:1rem"><textarea id="output" class="form-textarea" rows="14" placeholder="Results will appear here..."></textarea></div>
+            </div>
+          </div>
+        </div>
+        <div class="tool-sidebar">
+          <div class="card"><div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><div><h3 class="card-title">Notes</h3></div></div>
+            <div class="text-sm text-secondary" style="padding:1rem;">This is a lightweight beautifier. For large/complex codebases, use Prettier/ESLint in your project.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section"><h4>DevTools Hub</h4><p>Professional developer tools that work offline.</p></div>
+        <div class="footer-section"><h4>Formatters</h4><a href="js-beautifier.html">JS Beautifier</a></div>
+        <div class="footer-section"><h4>Popular</h4><a href="../tools/json-formatter.html">JSON</a><a href="../tools/qr-generator.html">QR</a></div>
+        <div class="footer-section"><h4>Features</h4><span>✓ Offline</span></div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2024 DevTools Hub.</p></div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    function clearAll(){ document.getElementById('input').value=''; document.getElementById('output').value=''; }
+    function copyOut(){ const t=document.getElementById('output').value; if(!t){ note('Nothing to copy'); return;} if(window.ClipboardManager) window.ClipboardManager.copyText(t); else if(navigator.clipboard) navigator.clipboard.writeText(t); note('Copied'); }
+    function downloadOut(){ const blob=new Blob([document.getElementById('output').value],{type:'application/javascript'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='beautified.js'; a.click(); URL.revokeObjectURL(a.href); }
+    function note(m){ if(window.ToastManager) window.ToastManager.show(m); else alert(m); }
+
+    function tryJsonFormat(src, indent){
+      try{ return JSON.stringify(JSON.parse(src), null, indent); }catch{ return null; }
+    }
+    function simpleBeautifyJS(src, indent){
+      // Very light-weight formatting: brace/newline handling
+      const lines = src.replace(/\r\n?/g,'\n').split('\n');
+      let depth=0; const out=[]; const ind = indent==='\t' ? '\t' : ' '.repeat(parseInt(indent,10));
+      for(let line of lines){
+        line = line.trim();
+        if(!line){ out.push(''); continue; }
+        const dedent = /^\}/.test(line) || /^\)/.test(line) || /^\]/.test(line);
+        if(dedent) depth = Math.max(0, depth-1);
+        out.push(ind.repeat(depth)+line);
+        const openCount=(line.match(/\{/g)||[]).length + (line.match(/\(/g)||[]).length + (line.match(/\[/g)||[]).length;
+        const closeCount=(line.match(/\}/g)||[]).length + (line.match(/\)/g)||[]).length + (line.match(/\]/g)||[]).length;
+        depth += Math.max(0, openCount - closeCount);
+      }
+      return out.join('\n');
+    }
+    function ensureSemicolons(src, want){
+      if(!want) return src;
+      return src.replace(/([^;{}\s])\n/g, '$1;\n');
+    }
+    function addTrailingCommas(src, want){
+      if(!want) return src;
+      return src.replace(/,(\s*[}\]])/g, '$1').replace(/([}\]])/g, ',$1').replace(/,([\s\S]*?),([\s\S]*?)$/,'$1,$2');
+    }
+    function run(){
+      const indent=document.getElementById('indent').value;
+      const semi=document.getElementById('semi').value==='yes';
+      const trailing=document.getElementById('trailing').value==='yes';
+      const tryjson=document.getElementById('tryjson').value==='yes';
+      const src=document.getElementById('input').value;
+      let out = tryjson? (tryJsonFormat(src, indent) || simpleBeautifyJS(src, indent)) : simpleBeautifyJS(src, indent);
+      out = ensureSemicolons(out, semi);
+      out = addTrailingCommas(out, trailing);
+      document.getElementById('output').value = out;
+    }
+  </script>
+</body>
+</html>
+

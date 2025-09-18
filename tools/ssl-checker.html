@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSL Certificate Checker - DevTools Hub</title>
+  <meta name="description" content="Basic SSL checker: attempts HTTPS fetch and reports status, TLS info when exposed.">
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+  <meta name="color-scheme" content="light dark">
+</head>
+<body data-theme="light">
+  <header class="header"><div class="container"><div class="header-content"><div class="logo"><button class="btn btn-ghost" onclick="goBack()" aria-label="Go back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button><a href="../index.html" class="logo"><span class="logo-icon">🛠️</span><span>DevTools Hub</span></a></div><nav class="nav-links"><a href="../index.html" class="nav-link">Home</a><a href="#" class="nav-link active">Network</a></nav><div class="header-actions"><div class="search-container"><input type="text" id="searchInput" placeholder="Search tools..." class="search-input"><svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button></div></div></div></header>
+
+  <main class="main"><div class="container"><div class="tool-layout"><div class="tool-content">
+    <div class="tool-header"><div class="tool-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="tool-info"><h1>SSL Certificate Checker</h1><p class="tool-description">Check HTTPS status and basic certificate details (where available to browser).</p></div></div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><div><h3 class="card-title">Check</h3></div></div>
+      <div class="grid" style="grid-template-columns: 2fr auto; gap:1rem; padding:1rem;">
+        <input id="url" class="form-input" placeholder="https://example.com">
+        <button class="btn btn-primary" onclick="check()">Check</button>
+      </div>
+      <div class="btn-group" style="padding:0 1rem 1rem"><button class="btn" onclick="copyOut()">Copy</button><button class="btn btn-ghost" onclick="clearOut()">Clear</button></div>
+      <div class="form-group" style="padding:0 1rem 1rem"><textarea id="out" class="form-textarea" rows="14" placeholder="Results..."></textarea></div>
+    </div>
+  </div></div></div></main>
+
+  <footer class="footer"><div class="container"><div class="footer-content"><div class="footer-section"><h4>DevTools Hub</h4><p>Professional developer tools that work offline.</p></div><div class="footer-section"><h4>Network</h4><a href="ssl-checker.html">SSL Checker</a></div><div class="footer-section"><h4>Popular</h4><a href="../tools/json-formatter.html">JSON</a><a href="../tools/qr-generator.html">QR</a></div><div class="footer-section"><h4>Features</h4><span>✓ Offline</span></div></div><div class="footer-bottom"><p>© 2024 DevTools Hub.</p></div></div></footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    function clearOut(){ document.getElementById('out').value=''; }
+    function copyOut(){ const t=document.getElementById('out').value; if(!t){ (window.ToastManager?ToastManager:alert)('Nothing to copy'); return;} if(window.ClipboardManager) window.ClipboardManager.copyText(t); else if(navigator.clipboard) navigator.clipboard.writeText(t); (window.ToastManager?ToastManager:alert)('Copied'); }
+    async function check(){
+      const url=(document.getElementById('url').value||'').trim();
+      if(!url){ (window.ToastManager?ToastManager:alert)('Enter a URL'); return; }
+      try{
+        const res=await fetch(url, { mode:'cors' });
+        const lines=[]; lines.push('Fetch status: '+res.status+' '+res.statusText);
+        // Browser does not expose detailed TLS info; show what we can infer
+        lines.push('TLS info: not exposed to JS (use server-side tools for full details).');
+        const hsts=res.headers.get('strict-transport-security'); if(hsts) lines.push('HSTS: '+hsts);
+        const csp=res.headers.get('content-security-policy'); if(csp) lines.push('CSP: '+csp);
+        const cert = res.headers.get('server-timing'); if(cert) lines.push('Server-Timing: '+cert);
+        document.getElementById('out').value = lines.join('\n');
+      }catch(e){ document.getElementById('out').value = 'Check failed (CORS or network). Try a public API or server-side check.'; }
+    }
+  </script>
+</body>
+</html>
+

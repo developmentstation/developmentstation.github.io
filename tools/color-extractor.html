@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette Extractor - DevTools Hub</title>
+    <meta name="description" content="Extract dominant colors from an image. Get HEX, RGB, and HSL values and export the palette.">
+    <meta name="keywords" content="color extractor, palette, dominant colors, image colors, color picker">
+    <meta name="author" content="DevTools Hub">
+    <meta name="robots" content="index, follow">
+
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="color-scheme" content="light dark">
+
+    <link rel="stylesheet" href="../assets/css/modern-styles.css">
+</head>
+<body data-theme="light">
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <a href="../index.html" class="logo">
+                        <span class="logo-icon">🛠️</span>
+                        <span>DevTools Hub</span>
+                    </a>
+                </div>
+                <nav class="nav-links">
+                    <a href="../index.html" class="nav-link">Home</a>
+                    <a href="#" class="nav-link active" onclick="filterTools('image')">Image & Media</a>
+                    <a href="image-base64.html" class="nav-link">Image → Base64</a>
+                    <a href="placeholder-generator.html" class="nav-link">Placeholder Generator</a>
+                </nav>
+                <div class="header-actions">
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+                        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.35-4.35"/>
+                        </svg>
+                    </div>
+                    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+                        <span id="themeIcon">🌙</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="breadcrumb">
+        <div class="container">
+            <nav class="breadcrumb-nav" aria-label="Breadcrumb"></nav>
+        </div>
+    </div>
+
+    <main class="main">
+        <div class="container">
+            <div class="tool-layout">
+                <div class="tool-content">
+                    <div class="tool-header">
+                        <div class="tool-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <circle cx="7.5" cy="10.5" r="1.5"/>
+                                <circle cx="12" cy="7.5" r="1.5"/>
+                                <circle cx="16.5" cy="10.5" r="1.5"/>
+                                <path d="M7.5 14.5a4.5 4.5 0 0 0 9 0"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <h1>Color Palette Extractor</h1>
+                            <p class="tool-description">Upload an image to extract its dominant colors. Copy HEX/RGB/HSL or export the palette.</p>
+                        </div>
+                    </div>
+
+                    <div class="card mb-6">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Upload Image</h3>
+                                <p class="card-description">Supported formats: PNG, JPG, WebP</p>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="imgInput">Select file</label>
+                                <input id="imgInput" type="file" accept="image/*" class="form-input" onchange="handleImage(event)">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="colorCount">Number of colors: <span id="colorCountLabel">8</span></label>
+                                <input id="colorCount" type="range" min="3" max="16" value="8" class="form-range" oninput="updateColorCount()">
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="extractColors()">Extract Colors</button>
+                            <button class="btn btn-outline" onclick="clearAll()">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="card mb-6">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="6" height="6" rx="1"/>
+                                    <rect x="15" y="3" width="6" height="6" rx="1"/>
+                                    <rect x="3" y="15" width="6" height="6" rx="1"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Preview</h3>
+                                <p class="card-description">Image preview</p>
+                            </div>
+                        </div>
+                        <div class="qr-display">
+                            <div class="qr-container" id="preview">
+                                <div class="qr-placeholder">
+                                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                        <rect x="3" y="3" width="6" height="6" rx="1"/>
+                                        <rect x="15" y="3" width="6" height="6" rx="1"/>
+                                        <rect x="3" y="15" width="6" height="6" rx="1"/>
+                                    </svg>
+                                    <p>Upload an image</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Extracted Palette</h3>
+                                <p class="card-description">Click a swatch to copy HEX</p>
+                            </div>
+                        </div>
+                        <div id="palette" class="grid palette-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;"></div>
+                        <div class="btn-group">
+                            <button class="btn btn-outline" onclick="exportPalette()">Export JSON</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-sidebar">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Tips</h3>
+                            </div>
+                        </div>
+                        <ul class="text-xs text-secondary" style="list-style: disc; padding-left: 18px;">
+                            <li>Larger images are auto-downsampled for speed</li>
+                            <li>Increase color count for richer palettes</li>
+                            <li>Click a swatch to copy its HEX</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>DevTools Hub</h4>
+                    <p>Professional developer tools that work offline. Privacy-focused and completely free.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Image & Media</h4>
+                    <a href="color-extractor.html">Color Extractor</a>
+                    <a href="image-base64.html">Image → Base64</a>
+                    <a href="placeholder-generator.html">Placeholder Generator</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Popular</h4>
+                    <a href="../tools/json-formatter.html">JSON Formatter</a>
+                    <a href="../tools/qr-generator.html">QR Generator</a>
+                    <a href="../tools/password-generator.html">Password Generator</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Features</h4>
+                    <span>✓ Works Offline</span>
+                    <span>✓ No Data Collection</span>
+                    <span>✓ Mobile Friendly</span>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 DevTools Hub. Built with ❤️ for developers.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/modern-shared.js"></script>
+    <script>
+        let loadedImage = null;
+
+        function updateColorCount() {
+            const v = document.getElementById('colorCount').value;
+            document.getElementById('colorCountLabel').textContent = v;
+        }
+
+        function handleImage(e) {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                const img = new Image();
+                img.onload = () => {
+                    loadedImage = img;
+                    showPreview(img);
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showPreview(img) {
+            const preview = document.getElementById('preview');
+            preview.innerHTML = '';
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            preview.appendChild(img);
+        }
+
+        function extractColors() {
+            if (!loadedImage) {
+                if (window.ToastManager) window.ToastManager.info('Upload an image first');
+                return;
+            }
+            const k = parseInt(document.getElementById('colorCount').value, 10) || 8;
+            const colors = getImageColors(loadedImage, k);
+            displayPalette(colors);
+            if (window.ToastManager) window.ToastManager.success('Colors extracted');
+        }
+
+        function clearAll() {
+            document.getElementById('imgInput').value = '';
+            document.getElementById('palette').innerHTML = '';
+            const preview = document.getElementById('preview');
+            preview.innerHTML = `
+                <div class="qr-placeholder">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <rect x="3" y="3" width="6" height="6" rx="1"/>
+                        <rect x="15" y="3" width="6" height="6" rx="1"/>
+                        <rect x="3" y="15" width="6" height="6" rx="1"/>
+                    </svg>
+                    <p>Upload an image</p>
+                </div>
+            `;
+            loadedImage = null;
+        }
+
+        function getImageColors(img, k) {
+            // Downsample large images for speed
+            const maxDim = 640;
+            let w = img.naturalWidth, h = img.naturalHeight;
+            const scale = Math.min(1, maxDim / Math.max(w, h));
+            w = Math.max(1, Math.round(w * scale));
+            h = Math.max(1, Math.round(h * scale));
+
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            ctx.drawImage(img, 0, 0, w, h);
+            const data = ctx.getImageData(0, 0, w, h).data;
+
+            // Sample pixels (stride)
+            const stride = 4 * 5; // every 5th pixel
+            const samples = [];
+            for (let i = 0; i < data.length; i += stride) {
+                const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+                if (a < 16) continue; // skip near-transparent
+                samples.push([r, g, b]);
+            }
+            if (samples.length === 0) return [];
+
+            // K-Means clustering (simple, few iterations)
+            const centroids = initCentroids(samples, k);
+            const iterations = 10;
+            for (let it = 0; it < iterations; it++) {
+                const clusters = Array.from({ length: k }, () => ({ sum: [0,0,0], count: 0 }));
+                for (let s = 0; s < samples.length; s++) {
+                    const c = closestCentroid(samples[s], centroids);
+                    clusters[c].sum[0] += samples[s][0];
+                    clusters[c].sum[1] += samples[s][1];
+                    clusters[c].sum[2] += samples[s][2];
+                    clusters[c].count++;
+                }
+                for (let c = 0; c < k; c++) {
+                    if (clusters[c].count > 0) {
+                        centroids[c] = [
+                            Math.round(clusters[c].sum[0] / clusters[c].count),
+                            Math.round(clusters[c].sum[1] / clusters[c].count),
+                            Math.round(clusters[c].sum[2] / clusters[c].count)
+                        ];
+                    }
+                }
+            }
+
+            // Rank by population (final assignment)
+            const pop = new Array(k).fill(0);
+            for (let s = 0; s < samples.length; s++) pop[closestCentroid(samples[s], centroids)]++;
+            const palette = centroids
+                .map((c, i) => ({ color: c, count: pop[i] }))
+                .filter(x => x.count > 0)
+                .sort((a, b) => b.count - a.count)
+                .map(x => x.color);
+            return palette;
+        }
+
+        function initCentroids(samples, k) {
+            const centroids = [];
+            const used = new Set();
+            while (centroids.length < k && used.size < samples.length) {
+                const idx = Math.floor(Math.random() * samples.length);
+                if (!used.has(idx)) { used.add(idx); centroids.push(samples[idx]); }
+            }
+            return centroids;
+        }
+
+        function closestCentroid(sample, centroids) {
+            let minD = Infinity, idx = 0;
+            for (let i = 0; i < centroids.length; i++) {
+                const d = dist2(sample, centroids[i]);
+                if (d < minD) { minD = d; idx = i; }
+            }
+            return idx;
+        }
+
+        function dist2(a, b) { // squared distance
+            const dr = a[0] - b[0];
+            const dg = a[1] - b[1];
+            const db = a[2] - b[2];
+            return dr*dr + dg*dg + db*db;
+        }
+
+        function displayPalette(colors) {
+            const container = document.getElementById('palette');
+            container.innerHTML = '';
+            const fragments = document.createDocumentFragment();
+            colors.forEach(rgb => {
+                const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
+                const hsl = rgbToHsl(rgb[0], rgb[1], rgb[2]);
+                const contrast = getContrastColor(hex);
+                const item = document.createElement('div');
+                item.className = 'card palette-item';
+                item.innerHTML = `
+                    <div class="swatch" style="background:${hex};color:${contrast}">
+                        <div class="swatch-label">${hex}</div>
+                        <button class="copy-btn-mini" data-value="${hex}">Copy</button>
+                    </div>
+                    <div class="codes">
+                        <div class="code-row"><span>HEX</span><code>${hex}</code></div>
+                        <div class="code-row"><span>RGB</span><code>rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})</code></div>
+                        <div class="code-row"><span>HSL</span><code>hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)</code></div>
+                    </div>
+                `;
+                fragments.appendChild(item);
+            });
+            container.appendChild(fragments);
+
+            // Copy buttons (delegated)
+            container.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('copy-btn-mini')) {
+                    const value = e.target.getAttribute('data-value');
+                    copyColor(value, e.target);
+                }
+            }, { once: true });
+        }
+
+        function rgbToHex(r, g, b) {
+            return '#' + [r,g,b].map(x => x.toString(16).padStart(2, '0')).join('');
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) { h = s = 0; }
+            else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h: Math.round(h*360), s: Math.round(s*100), l: Math.round(l*100) };
+        }
+
+        function copyColor(value, btn) {
+            if (window.ClipboardManager) {
+                window.ClipboardManager.copy(value, btn);
+            } else {
+                navigator.clipboard.writeText(value);
+            }
+        }
+
+        function exportPalette() {
+            const items = Array.from(document.querySelectorAll('#palette .palette-item'));
+            if (!items.length) {
+                if (window.ToastManager) window.ToastManager.info('No palette to export');
+                return;
+            }
+
+            const colors = items.map(card => {
+                const hex = (card.querySelector('.swatch-label')?.textContent || '').trim();
+                const rgbStr = card.querySelector('.code-row:nth-child(2) code')?.textContent || '';
+                const hslStr = card.querySelector('.code-row:nth-child(3) code')?.textContent || '';
+
+                const rgbMatch = rgbStr.match(/rgb\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)\)/i);
+                const hslMatch = hslStr.match(/hsl\((\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\)/i);
+
+                const rgb = rgbMatch ? { r: parseInt(rgbMatch[1],10), g: parseInt(rgbMatch[2],10), b: parseInt(rgbMatch[3],10) } : null;
+                const hsl = hslMatch ? { h: parseInt(hslMatch[1],10), s: parseInt(hslMatch[2],10), l: parseInt(hslMatch[3],10) } : null;
+
+                return { hex, rgb, hsl };
+            }).filter(c => c.hex);
+
+            const content = JSON.stringify({ palette: colors }, null, 2);
+            FileManager.downloadText(content, 'palette.json', 'application/json');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateColorCount();
+        });
+
+        function getContrastColor(hex) {
+            const h = hex.replace('#','');
+            const r = parseInt(h.substr(0,2),16);
+            const g = parseInt(h.substr(2,2),16);
+            const b = parseInt(h.substr(4,2),16);
+            // Relative luminance
+            const srgb = [r,g,b].map(v => {
+                v = v / 255;
+                return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4);
+            });
+            const L = 0.2126*srgb[0] + 0.7152*srgb[1] + 0.0722*srgb[2];
+            return L > 0.54 ? '#111827' : '#ffffff';
+        }
+    </script>
+
+    <style>
+        .palette-grid { gap: var(--spacing-4) !important; }
+        .palette-item { padding: 0; display: flex; flex-direction: column; overflow: hidden; }
+        .palette-item .swatch { height: 90px; display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-3); border-bottom: 1px solid var(--border-primary); }
+        .palette-item .swatch-label { font-family: var(--font-family-mono); font-weight: var(--font-semibold); }
+        .copy-btn-mini { font-size: var(--text-xs); padding: var(--spacing-1) var(--spacing-2); border: 1px solid var(--border-primary); border-radius: var(--radius-sm); background: transparent; color: inherit; cursor: pointer; }
+        .copy-btn-mini:hover { opacity: 0.9; }
+        .palette-item .codes { padding: var(--spacing-4); display: grid; gap: var(--spacing-2); }
+        .palette-item .code-row { display: flex; align-items: center; justify-content: space-between; font-size: var(--text-xs); }
+        .palette-item .code-row code { font-family: var(--font-family-mono); }
+    </style>
+</body>
+<!--
+This page uses simple k-means clustering to extract dominant colors.
+Optimized for client-side performance by downsampling and limited iterations.
+-->
+</html>
+

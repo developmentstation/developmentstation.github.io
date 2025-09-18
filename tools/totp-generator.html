@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOTP Generator - DevTools Hub</title>
+    <meta name="description" content="Generate Time-based One-Time Passwords (TOTP) for two-factor authentication. Compatible with Google Authenticator, Authy, and other 2FA apps.">
+    <meta name="keywords" content="totp generator, two factor authentication, 2fa, otp, google authenticator, authy, time based otp">
+    <meta name="ga-measurement-id" content="">
+    <link rel="stylesheet" href="../assets/css/modern-styles.css">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="../index.html">DevTools Hub</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="../index.html" class="nav-link">Home</a>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="tool-header">
+                <h1>TOTP Generator</h1>
+                <p>Generate Time-based One-Time Passwords (TOTP) for two-factor authentication compatible with Google Authenticator and other 2FA apps.</p>
+            </div>
+
+            <div class="tool-content">
+                <div class="input-section">
+                    <div class="form-group">
+                        <label for="secretKey">Secret Key (Base32)</label>
+                        <input type="text" id="secretKey" placeholder="Enter your secret key..." class="form-input">
+                        <div class="form-help">
+                            Enter the secret key provided by the service (usually in Base32 format)
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="timeStep">Time Step (seconds)</label>
+                            <select id="timeStep" class="form-select">
+                                <option value="30" selected>30 seconds (Standard)</option>
+                                <option value="60">60 seconds</option>
+                                <option value="15">15 seconds</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="digits">Code Length</label>
+                            <select id="digits" class="form-select">
+                                <option value="6" selected>6 digits (Standard)</option>
+                                <option value="8">8 digits</option>
+                                <option value="4">4 digits</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="algorithm">Algorithm</label>
+                            <select id="algorithm" class="form-select">
+                                <option value="SHA1" selected>SHA-1 (Standard)</option>
+                                <option value="SHA256">SHA-256</option>
+                                <option value="SHA512">SHA-512</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="autoRefresh">Auto Refresh</label>
+                            <select id="autoRefresh" class="form-select">
+                                <option value="true" selected>Enabled</option>
+                                <option value="false">Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button onclick="generateTOTP()" class="btn btn-primary" id="generateBtn">
+                            <span class="btn-text">🔢 Generate TOTP</span>
+                        </button>
+                        <button onclick="generateRandomSecret()" class="btn btn-outline">Generate Secret</button>
+                        <button onclick="clearAll()" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+
+                <div class="output-section" id="outputSection" style="display: none;">
+                    <div class="totp-display">
+                        <div class="totp-code" id="totpCode">------</div>
+                        <div class="totp-timer">
+                            <div class="timer-bar">
+                                <div class="timer-fill" id="timerFill"></div>
+                            </div>
+                            <div class="timer-text" id="timerText">--s remaining</div>
+                        </div>
+                    </div>
+
+                    <div class="section-header">
+                        <h3>TOTP Information</h3>
+                        <div class="button-group-sm">
+                            <button onclick="copyTOTP()" class="btn btn-outline btn-sm">Copy Code</button>
+                            <button onclick="generateQRCode()" class="btn btn-outline btn-sm">Show QR</button>
+                        </div>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Current Code:</span>
+                            <span class="info-value" id="currentCodeDisplay">------</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Next Code:</span>
+                            <span class="info-value" id="nextCodeDisplay">------</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Time Remaining:</span>
+                            <span class="info-value" id="timeRemainingDisplay">--s</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Current Time Step:</span>
+                            <span class="info-value" id="currentTimeStep">--</span>
+                        </div>
+                    </div>
+
+                    <div class="qr-section" id="qrSection" style="display: none;">
+                        <div class="section-header">
+                            <h3>QR Code for Mobile Apps</h3>
+                            <button onclick="hideQRCode()" class="btn btn-outline btn-sm">Hide QR</button>
+                        </div>
+                        <div class="qr-container">
+                            <canvas id="qrCanvas"></canvas>
+                        </div>
+                        <div class="form-help">
+                            Scan this QR code with Google Authenticator, Authy, or any compatible 2FA app
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>About TOTP</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Time-based OTP</h4>
+                            <p>TOTP generates unique codes based on the current time and a shared secret key. Each code is valid for a specific time window (typically 30 seconds).</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Compatible Apps</h4>
+                            <ul>
+                                <li>Google Authenticator</li>
+                                <li>Microsoft Authenticator</li>
+                                <li>Authy</li>
+                                <li>1Password</li>
+                                <li>LastPass Authenticator</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Security Features</h4>
+                            <ul>
+                                <li>Time-synchronized codes</li>
+                                <li>Short validity window</li>
+                                <li>Cryptographically secure</li>
+                                <li>Offline generation</li>
+                                <li>No network dependency</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Usage Tips</h4>
+                            <ul>
+                                <li>Keep your device time synchronized</li>
+                                <li>Store secret keys securely</li>
+                                <li>Have backup codes available</li>
+                                <li>Use multiple devices if possible</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevTools Hub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../assets/js/modern-shared.js"></script>
+    <script>
+        let totpInterval = null;
+        let currentSecret = '';
+
+        async function generateTOTP() {
+            const secretKey = document.getElementById('secretKey').value.trim();
+            const timeStep = parseInt(document.getElementById('timeStep').value);
+            const digits = parseInt(document.getElementById('digits').value);
+            const algorithm = document.getElementById('algorithm').value;
+            const autoRefresh = document.getElementById('autoRefresh').value === 'true';
+
+            if (!secretKey) {
+                if (window.ToastManager) {
+                    window.ToastManager.show('Please enter a secret key', 'error');
+                } else {
+                    alert('Please enter a secret key');
+                }
+                return;
+            }
+
+            try {
+                currentSecret = secretKey;
+                
+                // Clear existing interval
+                if (totpInterval) {
+                    clearInterval(totpInterval);
+                }
+
+                // Generate initial TOTP
+                await updateTOTP(secretKey, timeStep, digits, algorithm);
+                
+                document.getElementById('outputSection').style.display = 'block';
+
+                // Set up auto-refresh if enabled
+                if (autoRefresh) {
+                    totpInterval = setInterval(() => {
+                        updateTOTP(secretKey, timeStep, digits, algorithm);
+                    }, 1000);
+                }
+
+                if (window.ToastManager) {
+                    window.ToastManager.show('TOTP generation started!', 'success');
+                } else {
+                    alert('TOTP generation started!');
+                }
+
+            } catch (error) {
+                console.error('TOTP generation error:', error);
+                if (window.ToastManager) {
+                    window.ToastManager.show(`TOTP generation failed: ${error.message}`, 'error');
+                } else {
+                    alert(`TOTP generation failed: ${error.message}`);
+                }
+            }
+        }
+
+        async function updateTOTP(secretKey, timeStep, digits, algorithm) {
+            try {
+                const now = Math.floor(Date.now() / 1000);
+                const currentTimeStepValue = Math.floor(now / timeStep);
+                const nextTimeStepValue = currentTimeStepValue + 1;
+
+                const currentCode = await calculateTOTP(secretKey, currentTimeStepValue, digits, algorithm);
+                const nextCode = await calculateTOTP(secretKey, nextTimeStepValue, digits, algorithm);
+
+                const timeRemaining = timeStep - (now % timeStep);
+                const progressPercent = ((timeStep - timeRemaining) / timeStep) * 100;
+
+                // Update display
+                document.getElementById('totpCode').textContent = formatTOTPCode(currentCode);
+                document.getElementById('currentCodeDisplay').textContent = formatTOTPCode(currentCode);
+                document.getElementById('nextCodeDisplay').textContent = formatTOTPCode(nextCode);
+                document.getElementById('timeRemainingDisplay').textContent = `${timeRemaining}s`;
+                document.getElementById('currentTimeStep').textContent = currentTimeStepValue;
+
+                // Update timer
+                document.getElementById('timerFill').style.width = `${progressPercent}%`;
+                document.getElementById('timerText').textContent = `${timeRemaining}s remaining`;
+
+                // Change color based on remaining time
+                const timerFill = document.getElementById('timerFill');
+                if (timeRemaining <= 5) {
+                    timerFill.style.backgroundColor = '#ef4444'; // Red
+                } else if (timeRemaining <= 10) {
+                    timerFill.style.backgroundColor = '#f59e0b'; // Yellow
+                } else {
+                    timerFill.style.backgroundColor = '#10b981'; // Green
+                }
+
+            } catch (error) {
+                console.error('TOTP update error:', error);
+            }
+        }
+
+        async function calculateTOTP(secret, timeStep, digits, algorithm) {
+            // Decode Base32 secret
+            const secretBytes = base32Decode(secret);
+            
+            // Convert time step to 8-byte array (big-endian)
+            const timeBuffer = new ArrayBuffer(8);
+            const timeView = new DataView(timeBuffer);
+            timeView.setUint32(4, timeStep, false); // big-endian
+
+            // Import secret key
+            const key = await crypto.subtle.importKey(
+                'raw',
+                secretBytes,
+                { name: 'HMAC', hash: algorithm },
+                false,
+                ['sign']
+            );
+
+            // Generate HMAC
+            const hmacBuffer = await crypto.subtle.sign('HMAC', key, timeBuffer);
+            const hmacArray = new Uint8Array(hmacBuffer);
+
+            // Dynamic truncation
+            const offset = hmacArray[hmacArray.length - 1] & 0x0f;
+            const code = (
+                ((hmacArray[offset] & 0x7f) << 24) |
+                ((hmacArray[offset + 1] & 0xff) << 16) |
+                ((hmacArray[offset + 2] & 0xff) << 8) |
+                (hmacArray[offset + 3] & 0xff)
+            ) % Math.pow(10, digits);
+
+            return code.toString().padStart(digits, '0');
+        }
+
+        function formatTOTPCode(code) {
+            // Add space in the middle for 6-digit codes
+            if (code.length === 6) {
+                return code.substring(0, 3) + ' ' + code.substring(3);
+            }
+            return code;
+        }
+
+        function generateRandomSecret() {
+            // Generate 20 random bytes (160 bits)
+            const randomBytes = crypto.getRandomValues(new Uint8Array(20));
+            const secret = base32Encode(randomBytes);
+            
+            document.getElementById('secretKey').value = secret;
+            
+            if (window.ToastManager) {
+                window.ToastManager.show('Random secret key generated', 'success');
+            } else {
+                alert('Random secret key generated');
+            }
+        }
+
+        async function generateQRCode() {
+            if (!currentSecret) {
+                if (window.ToastManager) {
+                    window.ToastManager.show('Please generate TOTP first', 'error');
+                } else {
+                    alert('Please generate TOTP first');
+                }
+                return;
+            }
+
+            const timeStep = document.getElementById('timeStep').value;
+            const digits = document.getElementById('digits').value;
+            const algorithm = document.getElementById('algorithm').value;
+
+            // Create TOTP URI
+            const issuer = 'DevTools Hub';
+            const accountName = 'TOTP Generator';
+            const totpUri = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${currentSecret}&issuer=${encodeURIComponent(issuer)}&algorithm=${algorithm}&digits=${digits}&period=${timeStep}`;
+
+            try {
+                // Try to use QRCode library if available
+                if (typeof QRCode !== 'undefined') {
+                    const canvas = document.getElementById('qrCanvas');
+                    canvas.width = 256;
+                    canvas.height = 256;
+                    
+                    QRCode.toCanvas(canvas, totpUri, {
+                        width: 256,
+                        margin: 2,
+                        color: {
+                            dark: '#000000',
+                            light: '#FFFFFF'
+                        }
+                    });
+                } else {
+                    // Fallback: create a simple text representation
+                    const canvas = document.getElementById('qrCanvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 256;
+                    canvas.height = 256;
+                    
+                    ctx.fillStyle = '#f3f4f6';
+                    ctx.fillRect(0, 0, 256, 256);
+                    
+                    ctx.fillStyle = '#374151';
+                    ctx.font = '12px monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('QR Code Library', 128, 100);
+                    ctx.fillText('Not Available', 128, 120);
+                    ctx.fillText('Use this URI instead:', 128, 150);
+                    
+                    // Draw URI (truncated)
+                    const truncatedUri = totpUri.length > 40 ? totpUri.substring(0, 37) + '...' : totpUri;
+                    ctx.font = '8px monospace';
+                    ctx.fillText(truncatedUri, 128, 170);
+                }
+
+                document.getElementById('qrSection').style.display = 'block';
+
+            } catch (error) {
+                console.error('QR code generation error:', error);
+                if (window.ToastManager) {
+                    window.ToastManager.show('Failed to generate QR code', 'error');
+                } else {
+                    alert('Failed to generate QR code');
+                }
+            }
+        }
+
+        function hideQRCode() {
+            document.getElementById('qrSection').style.display = 'none';
+        }
+
+        function copyTOTP() {
+            const totpCode = document.getElementById('currentCodeDisplay').textContent.replace(/\s/g, '');
+
+            if (window.ClipboardManager) {
+                window.ClipboardManager.copy(totpCode);
+            } else {
+                navigator.clipboard.writeText(totpCode).then(() => {
+                    if (window.ToastManager) {
+                        window.ToastManager.show('TOTP code copied to clipboard!', 'success');
+                    } else {
+                        alert('TOTP code copied to clipboard!');
+                    }
+                }).catch(() => {
+                    if (window.ToastManager) {
+                        window.ToastManager.show('Failed to copy to clipboard', 'error');
+                    } else {
+                        alert('Failed to copy to clipboard');
+                    }
+                });
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('secretKey').value = '';
+            document.getElementById('outputSection').style.display = 'none';
+            document.getElementById('qrSection').style.display = 'none';
+            
+            if (totpInterval) {
+                clearInterval(totpInterval);
+                totpInterval = null;
+            }
+            
+            currentSecret = '';
+        }
+
+        // Base32 encoding/decoding functions
+        function base32Decode(base32) {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            const cleanedInput = base32.toUpperCase().replace(/[^A-Z2-7]/g, '');
+            
+            let bits = '';
+            for (let i = 0; i < cleanedInput.length; i++) {
+                const val = alphabet.indexOf(cleanedInput[i]);
+                if (val === -1) throw new Error('Invalid Base32 character');
+                bits += val.toString(2).padStart(5, '0');
+            }
+            
+            const bytes = [];
+            for (let i = 0; i < bits.length - 7; i += 8) {
+                bytes.push(parseInt(bits.substr(i, 8), 2));
+            }
+            
+            return new Uint8Array(bytes);
+        }
+
+        function base32Encode(bytes) {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            let bits = '';
+            
+            for (let i = 0; i < bytes.length; i++) {
+                bits += bytes[i].toString(2).padStart(8, '0');
+            }
+            
+            let result = '';
+            for (let i = 0; i < bits.length; i += 5) {
+                const chunk = bits.substr(i, 5).padEnd(5, '0');
+                result += alphabet[parseInt(chunk, 2)];
+            }
+            
+            return result;
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (totpInterval) {
+                clearInterval(totpInterval);
+            }
+        });
+    </script>
+
+    <style>
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .totp-display {
+            text-align: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .totp-code {
+            font-family: var(--font-mono);
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+            letter-spacing: 0.1em;
+        }
+
+        .totp-timer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .timer-bar {
+            width: 200px;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .timer-fill {
+            height: 100%;
+            background: #10b981;
+            border-radius: 4px;
+            transition: width 1s linear, background-color 0.3s ease;
+            width: 0%;
+        }
+
+        .timer-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .button-group-sm {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+
+        #qrCanvas {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .totp-code {
+                font-size: 2.5rem;
+            }
+
+            .timer-bar {
+                width: 150px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .button-group-sm {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+
+    <!-- Load QR Code library if available -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</body>
+</html>

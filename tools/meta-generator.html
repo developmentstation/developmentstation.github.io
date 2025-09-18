@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meta Tag Generator - DevTools Hub</title>
+  <meta name="description" content="Generate SEO, Open Graph, and Twitter meta tags. Copy and download.">
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+  <meta name="color-scheme" content="light dark">
+</head>
+<body data-theme="light">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <a href="../index.html" class="logo"><span class="logo-icon">🛠️</span><span>DevTools Hub</span></a>
+        </div>
+        <nav class="nav-links">
+          <a href="../index.html" class="nav-link">Home</a>
+          <a href="#" class="nav-link active">SEO</a>
+        </nav>
+        <div class="header-actions">
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-header">
+            <div class="tool-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1l9 4v6c0 5-4 9-9 10C7 20 3 16 3 11V5l9-4z"/></svg></div>
+            <div class="tool-info"><h1>Meta Tag Generator</h1><p class="tool-description">Create SEO, Open Graph, and Twitter tags for your page.</p></div>
+          </div>
+
+          <div class="card mb-6">
+            <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><div><h3 class="card-title">Inputs</h3></div></div>
+            <div class="grid" style="grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; padding: 1rem;">
+              <div class="form-group"><label class="form-label">Title</label><input id="title" class="form-input" placeholder="Site title"></div>
+              <div class="form-group"><label class="form-label">Site name</label><input id="siteName" class="form-input" placeholder="Site name"></div>
+              <div class="form-group" style="grid-column:1/-1"><label class="form-label">Description</label><textarea id="description" class="form-textarea" rows="3" placeholder="Short description"></textarea></div>
+              <div class="form-group"><label class="form-label">URL</label><input id="url" class="form-input" placeholder="https://example.com"></div>
+              <div class="form-group"><label class="form-label">Canonical URL</label><input id="canonical" class="form-input" placeholder="https://example.com/page"></div>
+              <div class="form-group"><label class="form-label">Keywords (comma separated)</label><input id="keywords" class="form-input" placeholder="keyword1, keyword2"></div>
+              <div class="form-group"><label class="form-label">Author</label><input id="author" class="form-input" placeholder="Your name"></div>
+              <div class="form-group"><label class="form-label">Robots</label><select id="robots" class="form-input"><option value="index,follow">index,follow</option><option value="noindex,nofollow">noindex,nofollow</option><option value="index,nofollow">index,nofollow</option><option value="noindex,follow">noindex,follow</option></select></div>
+              <div class="form-group"><label class="form-label">Theme color</label><input id="themeColor" class="form-input" type="color" value="#3b82f6"></div>
+              <div class="form-group"><label class="form-label">OG Image URL</label><input id="ogImage" class="form-input" placeholder="https://example.com/og.png"></div>
+              <div class="form-group"><label class="form-label">Twitter Card</label><select id="twitterCard" class="form-input"><option value="summary">summary</option><option value="summary_large_image">summary_large_image</option></select></div>
+              <div class="form-group"><label class="form-label">Twitter Site (@)</label><input id="twitterSite" class="form-input" placeholder="@yoursite"></div>
+            </div>
+            <div class="btn-group"><button class="btn btn-primary" onclick="generate()">Generate</button><button class="btn" onclick="copyOut()">Copy</button><button class="btn" onclick="downloadOut()">Download</button><button class="btn btn-ghost" onclick="clearAll()">Clear</button></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg></div><div><h3 class="card-title">Output</h3></div></div>
+            <div class="form-group" style="padding:1rem"><textarea id="out" class="form-textarea" rows="16" placeholder="Generated meta tags will appear here..."></textarea></div>
+          </div>
+        </div>
+
+        <div class="tool-sidebar">
+          <div class="card"><div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><div><h3 class="card-title">Tips</h3></div></div>
+            <div class="text-sm text-secondary" style="padding:1rem;">Paste into your <code>&lt;head&gt;</code> section. Validate on social previews.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section"><h4>DevTools Hub</h4><p>Professional developer tools that work offline.</p></div>
+        <div class="footer-section"><h4>SEO</h4><a href="meta-generator.html">Meta Generator</a><a href="seo-analyzer.html">SEO Analyzer</a></div>
+        <div class="footer-section"><h4>Popular</h4><a href="../tools/json-formatter.html">JSON</a><a href="../tools/qr-generator.html">QR</a></div>
+        <div class="footer-section"><h4>Features</h4><span>✓ Offline</span></div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2024 DevTools Hub.</p></div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    function clearAll(){ document.getElementById('out').value=''; document.querySelectorAll('.form-input, .form-textarea').forEach(el=>{ if(el.id!=='out') el.value=''; }); }
+    function note(m){ if(window.ToastManager) window.ToastManager.show(m); else alert(m); }
+    function copyOut(){ const t=document.getElementById('out').value; if(!t){ note('Nothing to copy'); return;} if(window.ClipboardManager) window.ClipboardManager.copyText(t); else if(navigator.clipboard) navigator.clipboard.writeText(t); note('Copied'); }
+    function downloadOut(){ const blob=new Blob([document.getElementById('out').value],{type:'text/html'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='meta-tags.html'; a.click(); URL.revokeObjectURL(a.href); }
+    function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function generate(){
+      const g=(id)=>document.getElementById(id).value.trim();
+      const title=g('title'), site=g('siteName'), desc=g('description'), url=g('url'), canonical=g('canonical'), kw=g('keywords'), author=g('author'), robots=g('robots'), theme=g('themeColor'), ogImage=g('ogImage'), twCard=g('twitterCard'), twSite=g('twitterSite');
+      const out = [];
+      out.push('<title>'+esc(title)+'</title>');
+      if(desc) out.push('<meta name="description" content="'+esc(desc)+'">');
+      if(kw) out.push('<meta name="keywords" content="'+esc(kw)+'">');
+      if(author) out.push('<meta name="author" content="'+esc(author)+'">');
+      out.push('<meta name="robots" content="'+esc(robots)+'">');
+      out.push('<meta name="viewport" content="width=device-width, initial-scale=1">');
+      if(theme) out.push('<meta name="theme-color" content="'+esc(theme)+'">');
+      if(canonical) out.push('<link rel="canonical" href="'+esc(canonical)+'">');
+      if(url) out.push('<meta property="og:url" content="'+esc(url)+'">');
+      if(site) out.push('<meta property="og:site_name" content="'+esc(site)+'">');
+      if(title) out.push('<meta property="og:title" content="'+esc(title)+'">');
+      if(desc) out.push('<meta property="og:description" content="'+esc(desc)+'">');
+      if(ogImage) out.push('<meta property="og:image" content="'+esc(ogImage)+'">');
+      out.push('<meta name="twitter:card" content="'+esc(twCard||'summary')+'">');
+      if(twSite) out.push('<meta name="twitter:site" content="'+esc(twSite)+'">');
+      if(title) out.push('<meta name="twitter:title" content="'+esc(title)+'">');
+      if(desc) out.push('<meta name="twitter:description" content="'+esc(desc)+'">');
+      if(ogImage) out.push('<meta name="twitter:image" content="'+esc(ogImage)+'">');
+      document.getElementById('out').value = out.join('\n');
+    }
+  </script>
+</body>
+</html>
+

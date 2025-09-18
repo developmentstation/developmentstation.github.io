@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YAML Converter - DevTools Hub</title>
+  <meta name="description" content="Convert YAML ↔ JSON offline with a minimal parser/serializer.">
+  <meta name="keywords" content="yaml to json, json to yaml, yaml converter">
+  <meta name="author" content="DevTools Hub">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+</head>
+<body data-theme="light">
+  <header class="header"><div class="container"><div class="header-content"><div class="logo"><button class="btn btn-ghost" onclick="goBack()" aria-label="Go back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button><a href="../index.html" class="logo"><span class="logo-icon">🛠️</span><span>DevTools Hub</span></a></div><nav class="nav-links"><a href="../index.html" class="nav-link">Home</a><a href="#" class="nav-link active" onclick="filterTools('data')">Data Tools</a></nav><div class="header-actions"><div class="search-container"><input type="text" id="searchInput" placeholder="Search tools..." class="search-input"><svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div><button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button></div></div></div></header>
+
+  <div class="breadcrumb"><div class="container"><nav class="breadcrumb-nav" aria-label="Breadcrumb"></nav></div></div>
+
+  <main class="main">
+    <div class="container"><div class="tool-layout"><div class="tool-content">
+      <div class="tool-header"><div class="tool-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></div><div class="tool-info"><h1>YAML Converter</h1><p class="tool-description">Convert YAML to JSON and back (basic subset).</p></div></div>
+
+      <div class="card mb-6"><div class="form-row"><div class="form-group"><label class="form-label" for="yamlIn">YAML</label><textarea id="yamlIn" class="form-textarea font-mono" rows="10" placeholder="name: Alice\nage: 30"></textarea></div><div class="form-group"><label class="form-label" for="yamlJson">JSON</label><textarea id="yamlJson" class="form-textarea font-mono" rows="10" placeholder='{"name":"Alice","age":30}'></textarea></div></div><div class="btn-group"><button class="btn btn-primary" onclick="yamlToJson()">YAML → JSON</button><button class="btn btn-secondary" onclick="jsonToYaml()">JSON → YAML</button><button class="btn btn-ghost" onclick="clearAll()">Clear</button></div></div>
+
+      <div class="card"><div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg></div><div><h3 class="card-title">Output</h3></div></div><div class="result-area"><textarea id="yamlOut" class="form-textarea font-mono" rows="12" readonly></textarea><button class="copy-btn" data-target="yamlOut">Copy</button></div></div>
+    </div><div class="tool-sidebar"><div class="card"><div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><div><h3 class="card-title">Notes</h3></div></div><ul class="text-xs text-secondary" style="list-style:disc;padding-left:18px;"><li>Basic YAML subset (key: value, lists with - item).</li><li>For complex YAML features, use a full parser.</li></ul></div></div></div>
+  </main>
+
+  <footer class="footer"><div class="container"><div class="footer-content"><div class="footer-section"><h4>DevTools Hub</h4><p>Professional developer tools that work offline.</p></div><div class="footer-section"><h4>Data</h4><a href="yaml-converter.html">YAML</a><a href="json-formatter.html">JSON</a></div><div class="footer-section"><h4>Popular</h4><a href="../tools/qr-generator.html">QR</a><a href="../tools/password-generator.html">Passwords</a></div><div class="footer-section"><h4>Features</h4><span>✓ Offline</span></div></div><div class="footer-bottom"><p>&copy; 2024 DevTools Hub.</p></div></div></footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    function clearAll(){ document.getElementById('yamlIn').value=''; document.getElementById('yamlJson').value=''; document.getElementById('yamlOut').value=''; }
+    function yamlToJson(){ try { const obj = parseYAML(document.getElementById('yamlIn').value||''); document.getElementById('yamlOut').value = JSON.stringify(obj, null, 2);} catch(e){ document.getElementById('yamlOut').value = 'Invalid YAML'; } }
+    function jsonToYaml(){ try { const obj = JSON.parse(document.getElementById('yamlJson').value||'{}'); document.getElementById('yamlOut').value = toYAML(obj); } catch(e){ document.getElementById('yamlOut').value='Invalid JSON'; } }
+
+    // Minimal YAML parser (very basic subset)
+    function parseYAML(text){
+      const lines = (text||'').replace(/\r/g,'').split('\n');
+      const root = {}; const stack = [{ indent: -1, value: root }];
+      for (let line of lines){
+        if (!line.trim()) continue; // skip empty
+        const indent = line.match(/^\s*/)[0].length;
+        while (stack.length && indent <= stack[stack.length-1].indent) stack.pop();
+        const parent = stack[stack.length-1].value;
+        if (line.trim().startsWith('- ')){
+          const item = line.trim().slice(2);
+          if (!Array.isArray(parent.items)) parent.items = [];
+          parent.items.push(coerce(item));
+          continue;
+        }
+        const kv = line.trim().split(/:\s*(.*)/);
+        const key = kv[0]; const val = kv[1];
+        if (val === undefined || val === ''){ // nested object
+          parent[key] = {};
+          stack.push({ indent, value: parent[key] });
+        } else {
+          parent[key] = coerce(val);
+        }
+      }
+      // unwrap .items arrays introduced by list shorthand
+      return unwrapLists(root);
+    }
+    function unwrapLists(obj){
+      if (Array.isArray(obj)) return obj.map(unwrapLists);
+      if (obj && typeof obj === 'object'){
+        const out = {}; for (const k of Object.keys(obj)){ out[k] = unwrapLists(obj[k]); }
+        if (out.items && Object.keys(out).length === 1) return out.items;
+        return out;
+      }
+      return obj;
+    }
+    function coerce(v){ if (v==='true') return true; if (v==='false') return false; if (v==='null') return null; const n=Number(v); return isNaN(n)?v:n; }
+    function toYAML(obj, indent=''){ if (Array.isArray(obj)) return obj.map(v=>indent+'- '+scalar(v)).join('\n'); if (obj && typeof obj==='object'){ return Object.keys(obj).map(k=>indent+k+': '+(isObj(obj[k])?'\n'+toYAML(obj[k], indent+'  '):scalar(obj[k]))).join('\n'); } return scalar(obj); }
+    function scalar(v){ if (v==null) return 'null'; if (typeof v==='boolean'||typeof v==='number') return String(v); if (/[:\-#\n]/.test(v)) return '"'+String(v).replace(/"/g,'\"')+'"'; return String(v); }
+    function isObj(v){ return v && typeof v==='object'; }
+  </script>
+</body>
+</html>
+

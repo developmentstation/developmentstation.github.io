@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Converter - DevTools Hub</title>
+  <meta name="description" content="Convert text case instantly: UPPERCASE, lowercase, Title Case, camelCase, PascalCase, snake_case, kebab-case, Sentence case, and more.">
+  <meta name="keywords" content="case converter, uppercase, lowercase, title case, camelcase, snake case, kebab case">
+  <meta name="author" content="DevTools Hub">
+  <meta name="robots" content="index, follow">
+
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="color-scheme" content="light dark">
+
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+</head>
+<body data-theme="light">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <a href="../index.html" class="logo">
+            <span class="logo-icon">🛠️</span>
+            <span>DevTools Hub</span>
+          </a>
+        </div>
+        <nav class="nav-links">
+          <a href="../index.html" class="nav-link">Home</a>
+          <a href="#" class="nav-link active" onclick="filterTools('text')">Text Tools</a>
+          <a href="word-counter.html" class="nav-link">Word Counter</a>
+          <a href="text-formatter.html" class="nav-link">Text Formatter</a>
+        </nav>
+        <div class="header-actions">
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+          </div>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb">
+    <div class="container">
+      <nav class="breadcrumb-nav" aria-label="Breadcrumb"></nav>
+    </div>
+  </div>
+
+  <main class="main">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-header">
+            <div class="tool-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 7V4h16v3M9 20H7l8-16h2L9 20z"/>
+              </svg>
+            </div>
+            <div class="tool-info">
+              <h1>Case Converter</h1>
+              <p class="tool-description">Convert text between cases. Clean, fast, and offline.</p>
+            </div>
+          </div>
+
+          <div class="card mb-6">
+            <div class="card-header">
+              <div class="card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </div>
+              <div>
+                <h3 class="card-title">Input</h3>
+                <p class="card-description">Paste or type your text</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="txtIn" class="form-label">Text</label>
+              <textarea id="txtIn" class="form-textarea" rows="10" placeholder="Enter your text here..."></textarea>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="convert('upper')">UPPERCASE</button>
+              <button class="btn btn-secondary" onclick="convert('lower')">lowercase</button>
+              <button class="btn btn-outline" onclick="convert('title')">Title Case</button>
+              <button class="btn btn-outline" onclick="convert('sentence')">Sentence case</button>
+              <button class="btn btn-outline" onclick="convert('camel')">camelCase</button>
+              <button class="btn btn-outline" onclick="convert('pascal')">PascalCase</button>
+              <button class="btn btn-outline" onclick="convert('snake')">snake_case</button>
+              <button class="btn btn-outline" onclick="convert('kebab')">kebab-case</button>
+              <button class="btn btn-outline" onclick="convert('train')">Train-Case</button>
+              <button class="btn btn-ghost" onclick="convert('toggle')">tOGGLE cASE</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              </div>
+              <div>
+                <h3 class="card-title">Output</h3>
+                <p class="card-description">Converted text</p>
+              </div>
+            </div>
+            <div class="result-area">
+              <textarea id="txtOut" class="form-textarea" rows="10" readonly placeholder="Result will appear here..."></textarea>
+              <button class="copy-btn" data-target="txtOut">Copy</button>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-outline" onclick="swap()">Swap</button>
+              <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tool-sidebar">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+              </div>
+              <div><h3 class="card-title">Tips</h3></div>
+            </div>
+            <ul class="text-xs text-secondary" style="list-style:disc;padding-left:18px;">
+              <li>Title case capitalizes significant words.</li>
+              <li>camelCase removes spaces and capitalizes the following words.</li>
+              <li>Use Swap to bring output back to input for chained operations.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>DevTools Hub</h4>
+          <p>Professional developer tools that work offline. Privacy‑focused and completely free.</p>
+        </div>
+        <div class="footer-section">
+          <h4>Text Tools</h4>
+          <a href="case-converter.html">Case Converter</a>
+          <a href="word-counter.html">Word Counter</a>
+          <a href="text-formatter.html">Text Formatter</a>
+        </div>
+        <div class="footer-section">
+          <h4>Popular</h4>
+          <a href="../tools/json-formatter.html">JSON Formatter</a>
+          <a href="../tools/qr-generator.html">QR Generator</a>
+          <a href="../tools/password-generator.html">Password Generator</a>
+        </div>
+        <div class="footer-section">
+          <h4>Features</h4>
+          <span>✓ Works Offline</span>
+          <span>✓ No Data Collection</span>
+          <span>✓ Mobile Friendly</span>
+        </div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2024 DevTools Hub. Built with ❤️ for developers.</p></div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    function val(id){ return document.getElementById(id).value; }
+    function set(id, v){ document.getElementById(id).value = v; }
+
+    function convert(type){
+      const text = val('txtIn');
+      let out = '';
+      switch(type){
+        case 'upper': out = text.toUpperCase(); break;
+        case 'lower': out = text.toLowerCase(); break;
+        case 'title': out = toTitleCase(text); break;
+        case 'sentence': out = toSentenceCase(text); break;
+        case 'camel': out = toCamelCase(text,false); break;
+        case 'pascal': out = toCamelCase(text,true); break;
+        case 'snake': out = toDelimited(text,'_'); break;
+        case 'kebab': out = toDelimited(text,'-'); break;
+        case 'train': out = toTrainCase(text); break;
+        case 'toggle': out = toggleCase(text); break;
+      }
+      set('txtOut', out);
+    }
+
+    function swap(){ const a = val('txtIn'); set('txtIn', val('txtOut')); set('txtOut', a); }
+    function clearAll(){ set('txtIn',''); set('txtOut',''); }
+
+    function wordsArray(str){
+      return (str || '')
+        .replace(/[_-]/g,' ')
+        .replace(/([a-z])([A-Z])/g,'$1 $2')
+        .split(/\s+/)
+        .filter(Boolean);
+    }
+
+    function toTitleCase(str){
+      const small = new Set(['a','an','the','and','but','or','nor','for','so','of','in','on','at','to','by','as']);
+      const w = wordsArray(str.toLowerCase());
+      return w.map((word, i) => {
+        if (i !== 0 && i !== w.length-1 && small.has(word)) return word;
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }).join(' ');
+    }
+
+    function toSentenceCase(str){
+      const s = (str || '').toLowerCase();
+      return s.replace(/(^\s*[a-z])|([.!?]\s*[a-z])/g, c => c.toUpperCase());
+    }
+
+    function toCamelCase(str, pascal){
+      const w = wordsArray(str.toLowerCase());
+      return w.map((word, i) => {
+        if (i === 0 && !pascal) return word;
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }).join('');
+    }
+
+    function toDelimited(str, delim){
+      const w = wordsArray(str.toLowerCase());
+      return w.join(delim);
+    }
+
+    function toTrainCase(str){
+      const w = wordsArray(str.toLowerCase());
+      return w.map(s => s.charAt(0).toUpperCase()+s.slice(1)).join('-');
+    }
+
+    function toggleCase(str){
+      let out = '';
+      for (const ch of (str||'')){
+        const up = ch.toUpperCase(); const low = ch.toLowerCase();
+        out += ch === up ? low : up;
+      }
+      return out;
+    }
+  </script>
+</body>
+</html>
+

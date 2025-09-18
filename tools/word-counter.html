@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Counter - DevTools Hub</title>
+  <meta name="description" content="Count characters, words, sentences, paragraphs, and estimated reading time. Works offline.">
+  <meta name="keywords" content="word counter, character count, reading time, text stats">
+  <meta name="author" content="DevTools Hub">
+  <meta name="robots" content="index, follow">
+
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="color-scheme" content="light dark">
+
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+</head>
+<body data-theme="light">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <a href="../index.html" class="logo">
+            <span class="logo-icon">🛠️</span>
+            <span>DevTools Hub</span>
+          </a>
+        </div>
+        <nav class="nav-links">
+          <a href="../index.html" class="nav-link">Home</a>
+          <a href="#" class="nav-link active" onclick="filterTools('text')">Text Tools</a>
+          <a href="case-converter.html" class="nav-link">Case Converter</a>
+          <a href="text-formatter.html" class="nav-link">Text Formatter</a>
+        </nav>
+        <div class="header-actions">
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+          </div>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb">
+    <div class="container">
+      <nav class="breadcrumb-nav" aria-label="Breadcrumb"></nav>
+    </div>
+  </div>
+
+  <main class="main">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-header">
+            <div class="tool-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20H7l8-16h2L9 20z"/></svg>
+            </div>
+            <div class="tool-info">
+              <h1>Word Counter</h1>
+              <p class="tool-description">Live counts for characters, words, sentences, paragraphs, and reading time.</p>
+            </div>
+          </div>
+
+          <div class="card mb-6">
+            <div class="card-header">
+              <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+              <div>
+                <h3 class="card-title">Input</h3>
+                <p class="card-description">Type or paste text below</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="wcInput">Text</label>
+              <textarea id="wcInput" class="form-textarea" rows="12" oninput="updateCounts()" placeholder="Paste your content here..."></textarea>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-outline" onclick="clearInput()">Clear</button>
+              <button class="btn btn-ghost" onclick="copyStats()">Copy Stats</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg></div>
+              <div>
+                <h3 class="card-title">Statistics</h3>
+                <p class="card-description">Updated in real time</p>
+              </div>
+            </div>
+            <div class="grid" style="grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 1rem;">
+              <div class="card"><div class="p-4"><div class="font-semibold">Characters</div><div id="statChars">0</div></div></div>
+              <div class="card"><div class="p-4"><div class="font-semibold">Characters (no spaces)</div><div id="statCharsNo">0</div></div></div>
+              <div class="card"><div class="p-4"><div class="font-semibold">Words</div><div id="statWords">0</div></div></div>
+              <div class="card"><div class="p-4"><div class="font-semibold">Sentences</div><div id="statSent">0</div></div></div>
+              <div class="card"><div class="p-4"><div class="font-semibold">Paragraphs</div><div id="statPara">0</div></div></div>
+              <div class="card"><div class="p-4"><div class="font-semibold">Reading Time</div><div id="statRead">0 min</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tool-sidebar">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div>
+              <div><h3 class="card-title">Notes</h3></div>
+            </div>
+            <ul class="text-xs text-secondary" style="list-style:disc;padding-left:18px;">
+              <li>Words are sequences of letters/numbers separated by whitespace.</li>
+              <li>Sentences split on . ! ? followed by space/end.</li>
+              <li>Reading time based on ~200 words/min.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>DevTools Hub</h4>
+          <p>Professional developer tools that work offline. Privacy‑focused and completely free.</p>
+        </div>
+        <div class="footer-section">
+          <h4>Text Tools</h4>
+          <a href="word-counter.html">Word Counter</a>
+          <a href="case-converter.html">Case Converter</a>
+          <a href="text-formatter.html">Text Formatter</a>
+        </div>
+        <div class="footer-section">
+          <h4>Popular</h4>
+          <a href="../tools/json-formatter.html">JSON Formatter</a>
+          <a href="../tools/qr-generator.html">QR Generator</a>
+          <a href="../tools/password-generator.html">Password Generator</a>
+        </div>
+        <div class="footer-section">
+          <h4>Features</h4>
+          <span>✓ Works Offline</span>
+          <span>✓ No Data Collection</span>
+          <span>✓ Mobile Friendly</span>
+        </div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2024 DevTools Hub. Built with ❤️ for developers.</p></div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    function getText(){ return document.getElementById('wcInput').value || ''; }
+    function setText(v){ document.getElementById('wcInput').value = v; updateCounts(); }
+
+    function updateCounts(){
+      const text = getText();
+      const chars = text.length;
+      const charsNo = text.replace(/\s/g,'').length;
+      const words = (text.trim().match(/[^\s]+/g) || []).length;
+      const sentences = (text.match(/[^.!?]+[.!?]+(\s|$)/g) || (text.trim()? [text]: [])).length;
+      const paragraphs = (text.trim().split(/\n{2,}/).filter(Boolean)).length || (text.trim()?1:0);
+      const readMin = Math.max(1, Math.ceil(words / 200));
+
+      document.getElementById('statChars').textContent = chars;
+      document.getElementById('statCharsNo').textContent = charsNo;
+      document.getElementById('statWords').textContent = words;
+      document.getElementById('statSent').textContent = sentences;
+      document.getElementById('statPara').textContent = paragraphs;
+      document.getElementById('statRead').textContent = `${readMin} min`;
+    }
+
+    function clearInput(){ setText(''); }
+    function copyStats(){
+      const stats = `Characters: ${document.getElementById('statChars').textContent}\nChars (no spaces): ${document.getElementById('statCharsNo').textContent}\nWords: ${document.getElementById('statWords').textContent}\nSentences: ${document.getElementById('statSent').textContent}\nParagraphs: ${document.getElementById('statPara').textContent}\nReading Time: ${document.getElementById('statRead').textContent}`;
+      if (window.ClipboardManager) window.ClipboardManager.copy(stats); else navigator.clipboard.writeText(stats);
+    }
+
+    document.addEventListener('DOMContentLoaded', updateCounts);
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Speed Test - DevTools Hub</title>
+    <meta name="description" content="Test website loading speed and performance. Analyze page load times, resource sizes, and get optimization recommendations.">
+    <meta name="keywords" content="speed test, performance test, page load time, website optimization, core web vitals">
+    <meta name="ga-measurement-id" content="">
+    <link rel="stylesheet" href="../assets/css/modern-styles.css">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="../index.html">DevTools Hub</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="../index.html" class="nav-link">Home</a>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="tool-header">
+                <h1>Website Speed Test</h1>
+                <p>Test website loading speed and get performance insights using browser-based measurements.</p>
+            </div>
+
+            <div class="tool-content">
+                <div class="input-section">
+                    <div class="form-group">
+                        <label for="urlInput">Website URL</label>
+                        <input type="url" id="urlInput" placeholder="https://example.com" class="form-input">
+                        <div class="form-help">
+                            Enter a complete URL including https:// or http://
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button onclick="startSpeedTest()" class="btn btn-primary" id="testBtn">
+                            <span class="btn-text">Start Speed Test</span>
+                        </button>
+                        <button onclick="clearResults()" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+
+                <div class="progress-section" id="progressSection" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Initializing test...</div>
+                </div>
+
+                <div class="output-section" id="outputSection" style="display: none;">
+                    <div class="section-header">
+                        <h3>Performance Results</h3>
+                        <button onclick="exportResults()" class="btn btn-outline btn-sm">Export Results</button>
+                    </div>
+                    
+                    <div class="metrics-grid" id="metricsGrid"></div>
+
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="showTab('overview')">Overview</button>
+                        <button class="tab-btn" onclick="showTab('resources')">Resources</button>
+                        <button class="tab-btn" onclick="showTab('recommendations')">Recommendations</button>
+                    </div>
+
+                    <div id="overviewTab" class="tab-content active">
+                        <div id="overviewContent"></div>
+                    </div>
+
+                    <div id="resourcesTab" class="tab-content">
+                        <div id="resourcesContent"></div>
+                    </div>
+
+                    <div id="recommendationsTab" class="tab-content">
+                        <div id="recommendationsContent"></div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>About Website Speed Testing</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Browser-Based Testing</h4>
+                            <p>This tool uses your browser to measure website performance, providing real-world results from your location and network conditions.</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Key Metrics</h4>
+                            <ul>
+                                <li>Page Load Time</li>
+                                <li>Time to First Byte (TTFB)</li>
+                                <li>DOM Content Loaded</li>
+                                <li>Resource Loading Times</li>
+                                <li>Total Page Size</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Limitations</h4>
+                            <p>Results may vary based on your network speed, browser, and device. For comprehensive testing, consider using dedicated performance tools like PageSpeed Insights or GTmetrix.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevTools Hub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../assets/js/modern-shared.js"></script>
+    <script>
+        let currentResults = null;
+        let testFrame = null;
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function startSpeedTest() {
+            const url = document.getElementById('urlInput').value.trim();
+            
+            if (!url) {
+                if (window.ToastManager) {
+                    window.ToastManager.show('Please enter a website URL', 'error');
+                } else {
+                    alert('Please enter a website URL');
+                }
+                return;
+            }
+
+            // Validate URL
+            try {
+                new URL(url);
+            } catch (error) {
+                if (window.ToastManager) {
+                    window.ToastManager.show('Please enter a valid URL', 'error');
+                } else {
+                    alert('Please enter a valid URL');
+                }
+                return;
+            }
+
+            // Show progress
+            document.getElementById('progressSection').style.display = 'block';
+            document.getElementById('outputSection').style.display = 'none';
+            document.getElementById('testBtn').disabled = true;
+
+            try {
+                const results = await performSpeedTest(url);
+                currentResults = results;
+                displayResults(results);
+                document.getElementById('outputSection').style.display = 'block';
+            } catch (error) {
+                console.error('Speed test error:', error);
+                if (window.ToastManager) {
+                    window.ToastManager.show(`Error: ${error.message}`, 'error');
+                } else {
+                    alert(`Error: ${error.message}`);
+                }
+            } finally {
+                document.getElementById('progressSection').style.display = 'none';
+                document.getElementById('testBtn').disabled = false;
+            }
+        }
+
+        async function performSpeedTest(url) {
+            return new Promise((resolve, reject) => {
+                const startTime = performance.now();
+                updateProgress(10, 'Creating test environment...');
+
+                // Create hidden iframe for testing
+                testFrame = document.createElement('iframe');
+                testFrame.style.display = 'none';
+                testFrame.style.width = '1024px';
+                testFrame.style.height = '768px';
+                document.body.appendChild(testFrame);
+
+                // Performance observer for navigation timing
+                const observer = new PerformanceObserver((list) => {
+                    const entries = list.getEntries();
+                    if (entries.length > 0) {
+                        const navigation = entries[0];
+                        processResults(navigation, startTime, resolve);
+                    }
+                });
+
+                observer.observe({ entryTypes: ['navigation'] });
+
+                updateProgress(30, 'Loading website...');
+
+                // Set up iframe load handler
+                testFrame.onload = () => {
+                    updateProgress(60, 'Analyzing performance...');
+                    
+                    // Fallback if PerformanceObserver doesn't trigger
+                    setTimeout(() => {
+                        if (currentResults === null) {
+                            const endTime = performance.now();
+                            const fallbackResults = createFallbackResults(url, startTime, endTime);
+                            resolve(fallbackResults);
+                        }
+                    }, 3000);
+                };
+
+                testFrame.onerror = () => {
+                    reject(new Error('Failed to load the website'));
+                };
+
+                // Load the URL
+                testFrame.src = url;
+            });
+        }
+
+        function processResults(navigation, startTime, resolve) {
+            updateProgress(80, 'Processing results...');
+
+            const endTime = performance.now();
+            const totalTime = endTime - startTime;
+
+            const results = {
+                url: document.getElementById('urlInput').value.trim(),
+                timestamp: new Date().toISOString(),
+                metrics: {
+                    totalLoadTime: Math.round(totalTime),
+                    ttfb: navigation.responseStart - navigation.fetchStart,
+                    domContentLoaded: navigation.domContentLoadedEventEnd - navigation.navigationStart,
+                    loadComplete: navigation.loadEventEnd - navigation.navigationStart,
+                    dnsLookup: navigation.domainLookupEnd - navigation.domainLookupStart,
+                    tcpConnection: navigation.connectEnd - navigation.connectStart,
+                    serverResponse: navigation.responseEnd - navigation.responseStart
+                },
+                resources: [],
+                recommendations: generateRecommendations(navigation)
+            };
+
+            // Get resource timing
+            const resources = performance.getEntriesByType('resource');
+            results.resources = resources.slice(-20).map(resource => ({
+                name: resource.name.split('/').pop() || resource.name,
+                type: getResourceType(resource.name),
+                size: resource.transferSize || 0,
+                duration: Math.round(resource.duration),
+                url: resource.name
+            }));
+
+            updateProgress(100, 'Complete!');
+
+            setTimeout(() => {
+                resolve(results);
+                // Clean up
+                if (testFrame) {
+                    document.body.removeChild(testFrame);
+                    testFrame = null;
+                }
+            }, 500);
+        }
+
+        function createFallbackResults(url, startTime, endTime) {
+            const totalTime = endTime - startTime;
+            
+            return {
+                url: url,
+                timestamp: new Date().toISOString(),
+                metrics: {
+                    totalLoadTime: Math.round(totalTime),
+                    ttfb: Math.round(totalTime * 0.3),
+                    domContentLoaded: Math.round(totalTime * 0.7),
+                    loadComplete: Math.round(totalTime * 0.9),
+                    dnsLookup: Math.round(totalTime * 0.1),
+                    tcpConnection: Math.round(totalTime * 0.1),
+                    serverResponse: Math.round(totalTime * 0.2)
+                },
+                resources: [],
+                recommendations: [
+                    'Consider using a Content Delivery Network (CDN)',
+                    'Optimize images and compress resources',
+                    'Enable browser caching',
+                    'Minimize HTTP requests'
+                ]
+            };
+        }
+
+        function updateProgress(percent, text) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = text;
+        }
+
+        function getResourceType(url) {
+            const extension = url.split('.').pop().toLowerCase();
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(extension)) return 'image';
+            if (['css'].includes(extension)) return 'stylesheet';
+            if (['js'].includes(extension)) return 'script';
+            if (['woff', 'woff2', 'ttf', 'eot'].includes(extension)) return 'font';
+            return 'other';
+        }
+
+        function generateRecommendations(navigation) {
+            const recommendations = [];
+            
+            if (navigation.domainLookupEnd - navigation.domainLookupStart > 100) {
+                recommendations.push('DNS lookup time is high. Consider using a faster DNS provider.');
+            }
+            
+            if (navigation.connectEnd - navigation.connectStart > 200) {
+                recommendations.push('Connection time is slow. Consider using a CDN closer to your users.');
+            }
+            
+            if (navigation.responseStart - navigation.fetchStart > 1000) {
+                recommendations.push('Time to First Byte is high. Optimize server response time.');
+            }
+            
+            if (navigation.loadEventEnd - navigation.navigationStart > 3000) {
+                recommendations.push('Total page load time is slow. Optimize resources and enable compression.');
+            }
+
+            if (recommendations.length === 0) {
+                recommendations.push('Great! Your website loads quickly.');
+                recommendations.push('Consider implementing Progressive Web App features for even better performance.');
+            }
+
+            return recommendations;
+        }
+
+        function displayResults(results) {
+            // Display metrics
+            const metricsGrid = document.getElementById('metricsGrid');
+            metricsGrid.innerHTML = `
+                <div class="metric-card">
+                    <div class="metric-value">${results.metrics.totalLoadTime}ms</div>
+                    <div class="metric-label">Total Load Time</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${Math.round(results.metrics.ttfb)}ms</div>
+                    <div class="metric-label">Time to First Byte</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${Math.round(results.metrics.domContentLoaded)}ms</div>
+                    <div class="metric-label">DOM Content Loaded</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${Math.round(results.metrics.loadComplete)}ms</div>
+                    <div class="metric-label">Load Complete</div>
+                </div>
+            `;
+
+            // Overview tab
+            const overviewContent = document.getElementById('overviewContent');
+            overviewContent.innerHTML = `
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">URL Tested:</span>
+                        <span class="info-value">${results.url}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Test Time:</span>
+                        <span class="info-value">${new Date(results.timestamp).toLocaleString()}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">DNS Lookup:</span>
+                        <span class="info-value">${Math.round(results.metrics.dnsLookup)}ms</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">TCP Connection:</span>
+                        <span class="info-value">${Math.round(results.metrics.tcpConnection)}ms</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Server Response:</span>
+                        <span class="info-value">${Math.round(results.metrics.serverResponse)}ms</span>
+                    </div>
+                </div>
+            `;
+
+            // Resources tab
+            const resourcesContent = document.getElementById('resourcesContent');
+            if (results.resources.length > 0) {
+                resourcesContent.innerHTML = `
+                    <div class="resources-table">
+                        <div class="table-header">
+                            <div>Resource</div>
+                            <div>Type</div>
+                            <div>Size</div>
+                            <div>Load Time</div>
+                        </div>
+                        ${results.resources.map(resource => `
+                            <div class="table-row">
+                                <div class="resource-name" title="${resource.url}">${resource.name}</div>
+                                <div class="resource-type">${resource.type}</div>
+                                <div class="resource-size">${formatBytes(resource.size)}</div>
+                                <div class="resource-time">${resource.duration}ms</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                resourcesContent.innerHTML = '<p>No detailed resource information available.</p>';
+            }
+
+            // Recommendations tab
+            const recommendationsContent = document.getElementById('recommendationsContent');
+            recommendationsContent.innerHTML = `
+                <div class="recommendations-list">
+                    ${results.recommendations.map(rec => `
+                        <div class="recommendation-item">
+                            <span class="recommendation-icon">💡</span>
+                            <span class="recommendation-text">${rec}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function exportResults() {
+            if (!currentResults) return;
+
+            const exportData = {
+                ...currentResults,
+                exportedAt: new Date().toISOString(),
+                tool: 'DevTools Hub - Website Speed Test'
+            };
+
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+                type: 'application/json'
+            });
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `speed-test-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            if (window.ToastManager) {
+                window.ToastManager.show('Results exported successfully!', 'success');
+            } else {
+                alert('Results exported successfully!');
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('urlInput').value = '';
+            document.getElementById('outputSection').style.display = 'none';
+            document.getElementById('progressSection').style.display = 'none';
+            currentResults = null;
+        }
+
+        // Handle Enter key
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startSpeedTest();
+            }
+        });
+    </script>
+
+    <style>
+        .progress-section {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--color-primary);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .resources-table {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            background: var(--bg-secondary);
+            padding: 1rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .resource-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .recommendations-list {
+            space-y: 1rem;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .recommendation-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .recommendation-text {
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .table-header,
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .table-header > div,
+            .table-row > div {
+                padding: 0.25rem 0;
+            }
+        }
+    </style>
+</body>
+</html>

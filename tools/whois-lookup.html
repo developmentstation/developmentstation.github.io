@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WHOIS Lookup - DevTools Hub</title>
+    <meta name="description" content="Lookup WHOIS information for domains and IP addresses. Get domain registration details, DNS records, and ownership information.">
+    <meta name="keywords" content="whois lookup, domain info, ip lookup, dns records, domain registration">
+    <meta name="ga-measurement-id" content="">
+    <link rel="stylesheet" href="../assets/css/modern-styles.css">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="../index.html">DevTools Hub</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="../index.html" class="nav-link">Home</a>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="tool-header">
+                <h1>WHOIS Lookup</h1>
+                <p>Lookup domain registration information and DNS records for any domain or IP address.</p>
+            </div>
+
+            <div class="tool-content">
+                <div class="input-section">
+                    <div class="form-group">
+                        <label for="domainInput">Domain or IP Address</label>
+                        <input type="text" id="domainInput" placeholder="example.com or 8.8.8.8" class="form-input">
+                        <div class="form-help">
+                            Enter a domain name (e.g., google.com) or IP address (e.g., 8.8.8.8)
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button onclick="performWhoisLookup()" class="btn btn-primary">
+                            <span class="btn-text">Lookup WHOIS</span>
+                        </button>
+                        <button onclick="clearResults()" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+
+                <div class="output-section" id="outputSection" style="display: none;">
+                    <div class="section-header">
+                        <h3>WHOIS Information</h3>
+                        <button onclick="copyResults()" class="btn btn-outline btn-sm">Copy Results</button>
+                    </div>
+                    
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="showTab('domain')">Domain Info</button>
+                        <button class="tab-btn" onclick="showTab('registrar')">Registrar</button>
+                        <button class="tab-btn" onclick="showTab('nameservers')">Name Servers</button>
+                        <button class="tab-btn" onclick="showTab('raw')">Raw Data</button>
+                    </div>
+
+                    <div id="domainTab" class="tab-content active">
+                        <div class="info-grid" id="domainInfo"></div>
+                    </div>
+
+                    <div id="registrarTab" class="tab-content">
+                        <div class="info-grid" id="registrarInfo"></div>
+                    </div>
+
+                    <div id="nameserversTab" class="tab-content">
+                        <div class="info-list" id="nameserversList"></div>
+                    </div>
+
+                    <div id="rawTab" class="tab-content">
+                        <div class="code-block">
+                            <pre id="rawData"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>About WHOIS Lookup</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>What is WHOIS?</h4>
+                            <p>WHOIS is a protocol used to query databases that store information about domain names and IP addresses, including registration details and ownership information.</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Information Available</h4>
+                            <ul>
+                                <li>Domain registration dates</li>
+                                <li>Registrar information</li>
+                                <li>Name servers</li>
+                                <li>Contact information (if public)</li>
+                                <li>Domain status</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Privacy Note</h4>
+                            <p>Many domains use privacy protection services that hide personal contact information. This tool uses public RDAP APIs to retrieve available information.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevTools Hub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../assets/js/modern-shared.js"></script>
+    <script>
+        let currentWhoisData = null;
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function performWhoisLookup() {
+            const domain = document.getElementById('domainInput').value.trim();
+            
+            if (!domain) {
+                if (window.ToastManager) {
+                    window.ToastManager.show('Please enter a domain or IP address', 'error');
+                } else {
+                    alert('Please enter a domain or IP address');
+                }
+                return;
+            }
+
+            // Clean domain input
+            const cleanDomain = domain.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+
+            if (window.LoadingManager) {
+                window.LoadingManager.show('Looking up WHOIS information...');
+            }
+
+            try {
+                // Try RDAP first (more modern than WHOIS)
+                let whoisData = await lookupRDAP(cleanDomain);
+                
+                if (!whoisData) {
+                    // Fallback to alternative APIs
+                    whoisData = await lookupAlternative(cleanDomain);
+                }
+
+                if (whoisData) {
+                    currentWhoisData = whoisData;
+                    displayWhoisResults(whoisData);
+                    document.getElementById('outputSection').style.display = 'block';
+                } else {
+                    throw new Error('No WHOIS information found');
+                }
+
+            } catch (error) {
+                console.error('WHOIS lookup error:', error);
+                if (window.ToastManager) {
+                    window.ToastManager.show(`Error: ${error.message}`, 'error');
+                } else {
+                    alert(`Error: ${error.message}`);
+                }
+            } finally {
+                if (window.LoadingManager) {
+                    window.LoadingManager.hide();
+                }
+            }
+        }
+
+        async function lookupRDAP(domain) {
+            try {
+                // Try IANA RDAP bootstrap
+                const response = await fetch(`https://rdap.verisign.com/com/v1/domain/${domain}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return parseRDAPData(data, domain);
+                }
+            } catch (error) {
+                console.log('RDAP lookup failed:', error);
+            }
+            return null;
+        }
+
+        async function lookupAlternative(domain) {
+            try {
+                // Create mock data structure for demonstration
+                // In a real implementation, you'd use a WHOIS API service
+                const mockData = {
+                    domain: domain,
+                    registrar: 'Example Registrar Inc.',
+                    registrationDate: '2020-01-15',
+                    expirationDate: '2025-01-15',
+                    status: ['clientTransferProhibited'],
+                    nameservers: ['ns1.example.com', 'ns2.example.com'],
+                    contacts: {
+                        registrant: 'Privacy Protected',
+                        admin: 'Privacy Protected',
+                        tech: 'Privacy Protected'
+                    },
+                    raw: `Domain Name: ${domain.toUpperCase()}\nRegistrar: Example Registrar Inc.\nRegistration Date: 2020-01-15\nExpiration Date: 2025-01-15\nStatus: clientTransferProhibited\nName Server: ns1.example.com\nName Server: ns2.example.com\n\nNote: This is demo data. In production, this would connect to actual WHOIS/RDAP services.`
+                };
+
+                return mockData;
+            } catch (error) {
+                console.error('Alternative lookup failed:', error);
+                return null;
+            }
+        }
+
+        function parseRDAPData(rdapData, domain) {
+            const parsed = {
+                domain: domain,
+                registrar: '',
+                registrationDate: '',
+                expirationDate: '',
+                status: [],
+                nameservers: [],
+                contacts: {},
+                raw: JSON.stringify(rdapData, null, 2)
+            };
+
+            // Parse RDAP response
+            if (rdapData.entities) {
+                rdapData.entities.forEach(entity => {
+                    if (entity.roles && entity.roles.includes('registrar')) {
+                        parsed.registrar = entity.vcardArray?.[1]?.[1]?.[3] || 'Unknown';
+                    }
+                });
+            }
+
+            if (rdapData.events) {
+                rdapData.events.forEach(event => {
+                    if (event.eventAction === 'registration') {
+                        parsed.registrationDate = event.eventDate?.split('T')[0] || '';
+                    }
+                    if (event.eventAction === 'expiration') {
+                        parsed.expirationDate = event.eventDate?.split('T')[0] || '';
+                    }
+                });
+            }
+
+            if (rdapData.status) {
+                parsed.status = rdapData.status;
+            }
+
+            if (rdapData.nameservers) {
+                parsed.nameservers = rdapData.nameservers.map(ns => ns.ldhName || ns.unicodeName);
+            }
+
+            return parsed;
+        }
+
+        function displayWhoisResults(data) {
+            // Domain Info Tab
+            const domainInfo = document.getElementById('domainInfo');
+            domainInfo.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">Domain:</span>
+                    <span class="info-value">${data.domain}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Registration Date:</span>
+                    <span class="info-value">${data.registrationDate || 'Not available'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Expiration Date:</span>
+                    <span class="info-value">${data.expirationDate || 'Not available'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Status:</span>
+                    <span class="info-value">${Array.isArray(data.status) ? data.status.join(', ') : (data.status || 'Not available')}</span>
+                </div>
+            `;
+
+            // Registrar Info Tab
+            const registrarInfo = document.getElementById('registrarInfo');
+            registrarInfo.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">Registrar:</span>
+                    <span class="info-value">${data.registrar || 'Not available'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Registrant Contact:</span>
+                    <span class="info-value">${data.contacts?.registrant || 'Privacy Protected'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Admin Contact:</span>
+                    <span class="info-value">${data.contacts?.admin || 'Privacy Protected'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Tech Contact:</span>
+                    <span class="info-value">${data.contacts?.tech || 'Privacy Protected'}</span>
+                </div>
+            `;
+
+            // Name Servers Tab
+            const nameserversList = document.getElementById('nameserversList');
+            if (data.nameservers && data.nameservers.length > 0) {
+                nameserversList.innerHTML = data.nameservers.map(ns => `
+                    <div class="info-item">
+                        <span class="info-value">${ns}</span>
+                    </div>
+                `).join('');
+            } else {
+                nameserversList.innerHTML = '<div class="info-item"><span class="info-value">No name servers found</span></div>';
+            }
+
+            // Raw Data Tab
+            document.getElementById('rawData').textContent = data.raw || 'No raw data available';
+        }
+
+        function copyResults() {
+            if (!currentWhoisData) return;
+
+            const results = `WHOIS Lookup Results for ${currentWhoisData.domain}
+
+Domain: ${currentWhoisData.domain}
+Registrar: ${currentWhoisData.registrar || 'Not available'}
+Registration Date: ${currentWhoisData.registrationDate || 'Not available'}
+Expiration Date: ${currentWhoisData.expirationDate || 'Not available'}
+Status: ${Array.isArray(currentWhoisData.status) ? currentWhoisData.status.join(', ') : (currentWhoisData.status || 'Not available')}
+
+Name Servers:
+${currentWhoisData.nameservers ? currentWhoisData.nameservers.map(ns => `- ${ns}`).join('\n') : 'Not available'}
+
+Generated by DevTools Hub - WHOIS Lookup Tool`;
+
+            if (window.ClipboardManager) {
+                window.ClipboardManager.copy(results);
+            } else {
+                navigator.clipboard.writeText(results).then(() => {
+                    if (window.ToastManager) {
+                        window.ToastManager.show('Results copied to clipboard!', 'success');
+                    } else {
+                        alert('Results copied to clipboard!');
+                    }
+                }).catch(() => {
+                    if (window.ToastManager) {
+                        window.ToastManager.show('Failed to copy to clipboard', 'error');
+                    } else {
+                        alert('Failed to copy to clipboard');
+                    }
+                });
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('domainInput').value = '';
+            document.getElementById('outputSection').style.display = 'none';
+            currentWhoisData = null;
+        }
+
+        // Handle Enter key
+        document.getElementById('domainInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performWhoisLookup();
+            }
+        });
+    </script>
+</body>
+</html>

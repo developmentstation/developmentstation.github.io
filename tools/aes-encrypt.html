@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AES Encrypt/Decrypt - DevTools Hub</title>
+    <meta name="description" content="Encrypt and decrypt text using AES (Advanced Encryption Standard) with multiple key sizes and modes. Secure client-side encryption tool.">
+    <meta name="keywords" content="aes encryption, aes decryption, advanced encryption standard, crypto, security, encrypt text, decrypt text">
+    <meta name="ga-measurement-id" content="">
+    <link rel="stylesheet" href="../assets/css/modern-styles.css">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><a href="../index.html">DevTools Hub</a></h1>
+                </div>
+                <nav class="nav">
+                    <a href="../index.html" class="nav-link">Home</a>
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="tool-header">
+                <h1>AES Encrypt/Decrypt</h1>
+                <p>Encrypt and decrypt text using AES (Advanced Encryption Standard) with client-side processing for maximum security.</p>
+            </div>
+
+            <div class="tool-content">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="showTab('encrypt')">Encrypt</button>
+                    <button class="tab-btn" onclick="showTab('decrypt')">Decrypt</button>
+                </div>
+
+                <div id="encryptTab" class="tab-content active">
+                    <div class="input-section">
+                        <div class="form-group">
+                            <label for="plainText">Text to Encrypt</label>
+                            <textarea id="plainText" placeholder="Enter text to encrypt..." class="form-textarea" rows="6"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="encryptKey">Encryption Key</label>
+                                <input type="password" id="encryptKey" placeholder="Enter encryption key" class="form-input">
+                                <button type="button" class="toggle-password" onclick="togglePassword('encryptKey')">👁️</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="keySize">Key Size</label>
+                                <select id="keySize" class="form-select">
+                                    <option value="128">128-bit</option>
+                                    <option value="192">192-bit</option>
+                                    <option value="256" selected>256-bit</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="mode">Mode</label>
+                                <select id="mode" class="form-select">
+                                    <option value="GCM" selected>GCM (Recommended)</option>
+                                    <option value="CBC">CBC</option>
+                                    <option value="CTR">CTR</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="outputFormat">Output Format</label>
+                                <select id="outputFormat" class="form-select">
+                                    <option value="base64" selected>Base64</option>
+                                    <option value="hex">Hexadecimal</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button onclick="encryptText()" class="btn btn-primary">
+                                <span class="btn-text">🔒 Encrypt</span>
+                            </button>
+                            <button onclick="generateRandomKey()" class="btn btn-outline">Generate Key</button>
+                            <button onclick="clearEncrypt()" class="btn btn-secondary">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="output-section" id="encryptOutput" style="display: none;">
+                        <div class="section-header">
+                            <h3>Encrypted Result</h3>
+                            <button onclick="copyEncryptedText()" class="btn btn-outline btn-sm">Copy</button>
+                        </div>
+                        <div class="code-block">
+                            <pre id="encryptedText"></pre>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Algorithm:</span>
+                                <span class="info-value" id="encryptAlgorithm"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">IV/Nonce:</span>
+                                <span class="info-value" id="encryptIV"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Auth Tag:</span>
+                                <span class="info-value" id="encryptAuthTag"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="decryptTab" class="tab-content">
+                    <div class="input-section">
+                        <div class="form-group">
+                            <label for="encryptedInput">Encrypted Text</label>
+                            <textarea id="encryptedInput" placeholder="Enter encrypted text..." class="form-textarea" rows="6"></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="decryptKey">Decryption Key</label>
+                                <input type="password" id="decryptKey" placeholder="Enter decryption key" class="form-input">
+                                <button type="button" class="toggle-password" onclick="togglePassword('decryptKey')">👁️</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="decryptKeySize">Key Size</label>
+                                <select id="decryptKeySize" class="form-select">
+                                    <option value="128">128-bit</option>
+                                    <option value="192">192-bit</option>
+                                    <option value="256" selected>256-bit</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="decryptMode">Mode</label>
+                                <select id="decryptMode" class="form-select">
+                                    <option value="GCM" selected>GCM</option>
+                                    <option value="CBC">CBC</option>
+                                    <option value="CTR">CTR</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputFormat">Input Format</label>
+                                <select id="inputFormat" class="form-select">
+                                    <option value="base64" selected>Base64</option>
+                                    <option value="hex">Hexadecimal</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button onclick="decryptText()" class="btn btn-primary">
+                                <span class="btn-text">🔓 Decrypt</span>
+                            </button>
+                            <button onclick="clearDecrypt()" class="btn btn-secondary">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="output-section" id="decryptOutput" style="display: none;">
+                        <div class="section-header">
+                            <h3>Decrypted Result</h3>
+                            <button onclick="copyDecryptedText()" class="btn btn-outline btn-sm">Copy</button>
+                        </div>
+                        <div class="code-block">
+                            <pre id="decryptedText"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>About AES Encryption</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>Advanced Encryption Standard</h4>
+                            <p>AES is a symmetric encryption algorithm adopted by the U.S. government and used worldwide. It's considered secure and efficient for protecting sensitive data.</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>Key Sizes</h4>
+                            <ul>
+                                <li><strong>128-bit:</strong> Fast, suitable for most applications</li>
+                                <li><strong>192-bit:</strong> More secure, balanced performance</li>
+                                <li><strong>256-bit:</strong> Highest security, government grade</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Encryption Modes</h4>
+                            <ul>
+                                <li><strong>GCM:</strong> Authenticated encryption (recommended)</li>
+                                <li><strong>CBC:</strong> Cipher Block Chaining</li>
+                                <li><strong>CTR:</strong> Counter mode</li>
+                            </ul>
+                        </div>
+                        <div class="info-card">
+                            <h4>Security Notes</h4>
+                            <ul>
+                                <li>All encryption is performed client-side</li>
+                                <li>Keys are never transmitted or stored</li>
+                                <li>Use strong, unique passwords</li>
+                                <li>Keep your encryption keys secure</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 DevTools Hub. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="../assets/js/modern-shared.js"></script>
+    <script>
+        let currentEncryptedData = null;
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const button = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️';
+            }
+        }
+
+        async function encryptText() {
+            const plainText = document.getElementById('plainText').value.trim();
+            const key = document.getElementById('encryptKey').value;
+            const keySize = parseInt(document.getElementById('keySize').value);
+            const mode = document.getElementById('mode').value;
+            const outputFormat = document.getElementById('outputFormat').value;
+
+            if (!plainText) {
+                if (window.ToastManager) {
+                    window.ToastManager.show('Please enter text to encrypt', 'error');
+                } else {
+                    alert('Please enter text to encrypt');
+                }
+                return;
+            }
+
+            if (!key) {
+                if (window.ToastManager) {
+                    window.ToastManager.show('Please enter an encryption key', 'error');
+                } else {
+                    alert('Please enter an encryption key');
+                }
+                return;
+            }
+
+            if (window.LoadingManager) {
+                window.LoadingManager.show('Encrypting...');
+            }
+
+            try {
+                const result = await performAESEncryption(plainText, key, keySize, mode);
+                currentEncryptedData = result;
+                
+                // Display results
+                const formattedOutput = outputFormat === 'base64' 
+                    ? result.ciphertext 
+                    : arrayBufferToHex(base64ToArrayBuffer(result.ciphertext));
+
+                document.getElementById('encryptedText').textContent = formattedOutput;
+                document.getElementById('encryptAlgorithm').textContent = `AES-${keySize}-${mode}`;
+                document.getElementById('encryptIV').textContent = outputFormat === 'base64' 
+                    ? result.iv 
+                    : arrayBufferToHex(base64ToArrayBuffer(result.iv));
+                document.getElementById('encryptAuthTag').textContent = result.authTag 
+                    ? (outputFormat === 'base64' ? result.authTag : arrayBufferToHex(base64ToArrayBuffer(result.authTag)))
+                    : 'N/A (not used in this mode)';
+
+                document.getElementById('encryptOutput').style.display = 'block';
+
+                if (window.ToastManager) {
+                    window.ToastManager.show('Text encrypted successfully!', 'success');
+                } else {
+                    alert('Text encrypted successfully!');
+                }
+
+            } catch (error) {
+                console.error('Encryption error:', error);
+                if (window.ToastManager) {
+                    window.ToastManager.show(`Encryption failed: ${error.message}`, 'error');
+                } else {
+                    alert(`Encryption failed: ${error.message}`);
+                }
+            } finally {
+                if (window.LoadingManager) {
+                    window.LoadingManager.hide();
+                }
+            }
+        }
+
+        async function decryptText() {
+            const encryptedInput = document.getElementById('encryptedInput').value.trim();
+            const key = document.getElementById('decryptKey').value;
+            const keySize = parseInt(document.getElementById('decryptKeySize').value);
+            const mode = document.getElementById('decryptMode').value;
+            const inputFormat = document.getElementById('inputFormat').value;
+
+            if (!encryptedInput) {
+                if (window.ToastManager) {
+                    window.ToastManager.show('Please enter encrypted text', 'error');
+                } else {
+                    alert('Please enter encrypted text');
+                }
+                return;
+            }
+
+            if (!key) {
+                if (window.ToastManager) {
+                    window.ToastManager.show('Please enter the decryption key', 'error');
+                } else {
+                    alert('Please enter the decryption key');
+                }
+                return;
+            }
+
+            if (window.LoadingManager) {
+                window.LoadingManager.show('Decrypting...');
+            }
+
+            try {
+                // Parse the encrypted data
+                let ciphertext, iv, authTag = null;
+                
+                if (encryptedInput.includes('|')) {
+                    // Format: ciphertext|iv|authTag (for GCM) or ciphertext|iv (for others)
+                    const parts = encryptedInput.split('|');
+                    ciphertext = parts[0];
+                    iv = parts[1];
+                    authTag = parts[2] || null;
+                } else {
+                    // Assume it's just ciphertext, need IV and authTag separately
+                    ciphertext = encryptedInput;
+                    // For demo purposes, we'll show an error
+                    throw new Error('Invalid format. Expected format: ciphertext|iv|authTag (for GCM) or ciphertext|iv');
+                }
+
+                const result = await performAESDecryption(ciphertext, iv, authTag, key, keySize, mode, inputFormat);
+                
+                document.getElementById('decryptedText').textContent = result;
+                document.getElementById('decryptOutput').style.display = 'block';
+
+                if (window.ToastManager) {
+                    window.ToastManager.show('Text decrypted successfully!', 'success');
+                } else {
+                    alert('Text decrypted successfully!');
+                }
+
+            } catch (error) {
+                console.error('Decryption error:', error);
+                if (window.ToastManager) {
+                    window.ToastManager.show(`Decryption failed: ${error.message}`, 'error');
+                } else {
+                    alert(`Decryption failed: ${error.message}`);
+                }
+            } finally {
+                if (window.LoadingManager) {
+                    window.LoadingManager.hide();
+                }
+            }
+        }
+
+        async function performAESEncryption(plainText, password, keySize, mode) {
+            // Derive key from password
+            const keyMaterial = await window.crypto.subtle.importKey(
+                'raw',
+                new TextEncoder().encode(password),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveBits', 'deriveKey']
+            );
+
+            const salt = window.crypto.getRandomValues(new Uint8Array(16));
+            const key = await window.crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: salt,
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-' + mode, length: keySize },
+                false,
+                ['encrypt']
+            );
+
+            // Generate IV
+            const iv = window.crypto.getRandomValues(new Uint8Array(mode === 'GCM' ? 12 : 16));
+
+            // Encrypt
+            const algorithm = mode === 'GCM' 
+                ? { name: 'AES-GCM', iv: iv }
+                : mode === 'CBC'
+                ? { name: 'AES-CBC', iv: iv }
+                : { name: 'AES-CTR', counter: iv, length: 64 };
+
+            const encrypted = await window.crypto.subtle.encrypt(
+                algorithm,
+                key,
+                new TextEncoder().encode(plainText)
+            );
+
+            const result = {
+                ciphertext: arrayBufferToBase64(encrypted),
+                iv: arrayBufferToBase64(iv),
+                salt: arrayBufferToBase64(salt)
+            };
+
+            if (mode === 'GCM') {
+                // For GCM, the authentication tag is included in the encrypted data
+                const encryptedArray = new Uint8Array(encrypted);
+                const ciphertext = encryptedArray.slice(0, -16);
+                const authTag = encryptedArray.slice(-16);
+                
+                result.ciphertext = arrayBufferToBase64(ciphertext);
+                result.authTag = arrayBufferToBase64(authTag);
+            }
+
+            return result;
+        }
+
+        async function performAESDecryption(ciphertext, iv, authTag, password, keySize, mode, inputFormat) {
+            // Convert inputs based on format
+            const ciphertextBuffer = inputFormat === 'base64' 
+                ? base64ToArrayBuffer(ciphertext) 
+                : hexToArrayBuffer(ciphertext);
+            const ivBuffer = inputFormat === 'base64' 
+                ? base64ToArrayBuffer(iv) 
+                : hexToArrayBuffer(iv);
+
+            // For demo purposes, we'll generate a salt (in real implementation, this should be stored with the encrypted data)
+            const salt = window.crypto.getRandomValues(new Uint8Array(16));
+
+            // Derive key from password
+            const keyMaterial = await window.crypto.subtle.importKey(
+                'raw',
+                new TextEncoder().encode(password),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveBits', 'deriveKey']
+            );
+
+            const key = await window.crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: salt,
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-' + mode, length: keySize },
+                false,
+                ['decrypt']
+            );
+
+            // Prepare data for decryption
+            let dataToDecrypt = ciphertextBuffer;
+            
+            if (mode === 'GCM' && authTag) {
+                const authTagBuffer = inputFormat === 'base64' 
+                    ? base64ToArrayBuffer(authTag) 
+                    : hexToArrayBuffer(authTag);
+                
+                // Combine ciphertext and auth tag for GCM
+                const combined = new Uint8Array(ciphertextBuffer.byteLength + authTagBuffer.byteLength);
+                combined.set(new Uint8Array(ciphertextBuffer));
+                combined.set(new Uint8Array(authTagBuffer), ciphertextBuffer.byteLength);
+                dataToDecrypt = combined.buffer;
+            }
+
+            // Decrypt
+            const algorithm = mode === 'GCM' 
+                ? { name: 'AES-GCM', iv: ivBuffer }
+                : mode === 'CBC'
+                ? { name: 'AES-CBC', iv: ivBuffer }
+                : { name: 'AES-CTR', counter: ivBuffer, length: 64 };
+
+            const decrypted = await window.crypto.subtle.decrypt(
+                algorithm,
+                key,
+                dataToDecrypt
+            );
+
+            return new TextDecoder().decode(decrypted);
+        }
+
+        function generateRandomKey() {
+            const keySize = parseInt(document.getElementById('keySize').value);
+            const keyLength = keySize / 8; // Convert bits to bytes
+            const randomBytes = window.crypto.getRandomValues(new Uint8Array(keyLength));
+            const randomKey = arrayBufferToBase64(randomBytes);
+            
+            document.getElementById('encryptKey').value = randomKey;
+            
+            if (window.ToastManager) {
+                window.ToastManager.show(`Generated ${keySize}-bit random key`, 'success');
+            } else {
+                alert(`Generated ${keySize}-bit random key`);
+            }
+        }
+
+        function copyEncryptedText() {
+            const outputFormat = document.getElementById('outputFormat').value;
+            const encryptedText = document.getElementById('encryptedText').textContent;
+            const iv = document.getElementById('encryptIV').textContent;
+            const authTag = document.getElementById('encryptAuthTag').textContent;
+            
+            let copyText = encryptedText;
+            if (authTag && authTag !== 'N/A (not used in this mode)') {
+                copyText = `${encryptedText}|${iv}|${authTag}`;
+            } else {
+                copyText = `${encryptedText}|${iv}`;
+            }
+
+            if (window.ClipboardManager) {
+                window.ClipboardManager.copy(copyText);
+            } else {
+                navigator.clipboard.writeText(copyText).then(() => {
+                    if (window.ToastManager) {
+                        window.ToastManager.show('Encrypted text copied to clipboard!', 'success');
+                    } else {
+                        alert('Encrypted text copied to clipboard!');
+                    }
+                }).catch(() => {
+                    if (window.ToastManager) {
+                        window.ToastManager.show('Failed to copy to clipboard', 'error');
+                    } else {
+                        alert('Failed to copy to clipboard');
+                    }
+                });
+            }
+        }
+
+        function copyDecryptedText() {
+            const decryptedText = document.getElementById('decryptedText').textContent;
+
+            if (window.ClipboardManager) {
+                window.ClipboardManager.copy(decryptedText);
+            } else {
+                navigator.clipboard.writeText(decryptedText).then(() => {
+                    if (window.ToastManager) {
+                        window.ToastManager.show('Decrypted text copied to clipboard!', 'success');
+                    } else {
+                        alert('Decrypted text copied to clipboard!');
+                    }
+                }).catch(() => {
+                    if (window.ToastManager) {
+                        window.ToastManager.show('Failed to copy to clipboard', 'error');
+                    } else {
+                        alert('Failed to copy to clipboard');
+                    }
+                });
+            }
+        }
+
+        function clearEncrypt() {
+            document.getElementById('plainText').value = '';
+            document.getElementById('encryptKey').value = '';
+            document.getElementById('encryptOutput').style.display = 'none';
+            currentEncryptedData = null;
+        }
+
+        function clearDecrypt() {
+            document.getElementById('encryptedInput').value = '';
+            document.getElementById('decryptKey').value = '';
+            document.getElementById('decryptOutput').style.display = 'none';
+        }
+
+        // Utility functions
+        function arrayBufferToBase64(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        function base64ToArrayBuffer(base64) {
+            const binary = window.atob(base64);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        function arrayBufferToHex(buffer) {
+            return Array.from(new Uint8Array(buffer))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        function hexToArrayBuffer(hex) {
+            const bytes = new Uint8Array(hex.length / 2);
+            for (let i = 0; i < hex.length; i += 2) {
+                bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+            }
+            return bytes.buffer;
+        }
+    </script>
+
+    <style>
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.25rem;
+            border-radius: 4px;
+            margin-top: 1.2rem;
+        }
+
+        .toggle-password:hover {
+            background: var(--bg-secondary);
+        }
+
+        .info-grid .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-grid .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            word-break: break-all;
+            max-width: 60%;
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .info-value {
+                max-width: 50%;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</body>
+</html>

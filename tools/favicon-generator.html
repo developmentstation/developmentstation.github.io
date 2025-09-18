@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Favicon Generator - DevTools Hub</title>
+  <meta name="description" content="Generate favicons from text/emoji. Download multiple PNG sizes and copy link tags.">
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+  <meta name="color-scheme" content="light dark">
+  <style>.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:1rem}</style>
+</head>
+<body data-theme="light">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <a href="../index.html" class="logo"><span class="logo-icon">🛠️</span><span>DevTools Hub</span></a>
+        </div>
+        <nav class="nav-links">
+          <a href="../index.html" class="nav-link">Home</a>
+          <a href="#" class="nav-link active">Assets</a>
+        </nav>
+        <div class="header-actions">
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-header">
+            <div class="tool-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/></svg></div>
+            <div class="tool-info"><h1>Favicon Generator</h1><p class="tool-description">Create PNG favicons from text or emoji. Download sizes and tags.</p></div>
+          </div>
+
+          <div class="card mb-6">
+            <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><div><h3 class="card-title">Options</h3></div></div>
+            <div class="grid" style="grid-template-columns: repeat(4, minmax(0,1fr)); gap: 1rem; padding: 1rem;">
+              <div class="form-group"><label class="form-label">Text/Emoji</label><input id="text" class="form-input" placeholder="🔧"></div>
+              <div class="form-group"><label class="form-label">Background</label><input id="bg" type="color" class="form-input" value="#3b82f6"></div>
+              <div class="form-group"><label class="form-label">Text color</label><input id="fg" type="color" class="form-input" value="#ffffff"></div>
+              <div class="form-group"><label class="form-label">Shape</label><select id="shape" class="form-input"><option value="square">Square</option><option value="circle">Circle</option><option value="transparent">Transparent</option></select></div>
+              <div class="form-group"><label class="form-label">Font size</label><input id="fontSize" type="number" min="8" max="512" value="128" class="form-input"></div>
+              <div class="form-group" style="grid-column:1/-1"><label class="form-label">Sizes</label><div class="flex-row" style="flex-wrap:wrap; gap:.5rem"><label><input type="checkbox" class="size" value="16" checked> 16</label><label><input type="checkbox" class="size" value="32" checked> 32</label><label><input type="checkbox" class="size" value="48" checked> 48</label><label><input type="checkbox" class="size" value="64"> 64</label><label><input type="checkbox" class="size" value="128"> 128</label><label><input type="checkbox" class="size" value="180"> 180</label><label><input type="checkbox" class="size" value="192"> 192</label><label><input type="checkbox" class="size" value="512"> 512</label></div></div>
+            </div>
+            <div class="btn-group"><button class="btn btn-primary" onclick="generate()">Generate</button><button class="btn" onclick="downloadAll()">Download All</button><button class="btn" onclick="copyTags()">Copy link tags</button><button class="btn btn-ghost" onclick="clearAll()">Clear</button></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg></div><div><h3 class="card-title">Previews</h3></div></div>
+            <div id="previews" class="preview-grid" style="padding:1rem"></div>
+          </div>
+        </div>
+        <div class="tool-sidebar">
+          <div class="card"><div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><div><h3 class="card-title">Tags</h3></div></div>
+            <div class="form-group" style="padding:1rem"><textarea id="tags" class="form-textarea" rows="10" placeholder="Generated link tags will appear here..."></textarea></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section"><h4>DevTools Hub</h4><p>Professional developer tools that work offline.</p></div>
+        <div class="footer-section"><h4>Assets</h4><a href="favicon-generator.html">Favicon Generator</a></div>
+        <div class="footer-section"><h4>Popular</h4><a href="../tools/json-formatter.html">JSON</a><a href="../tools/qr-generator.html">QR</a></div>
+        <div class="footer-section"><h4>Features</h4><span>✓ Offline</span></div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2024 DevTools Hub.</p></div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    const generated = new Map();
+    function clearAll(){ document.getElementById('text').value=''; document.getElementById('previews').innerHTML=''; document.getElementById('tags').value=''; generated.clear(); }
+    function note(m){ if(window.ToastManager) window.ToastManager.show(m); else alert(m); }
+    function draw(size){
+      const text=document.getElementById('text').value||'🔧';
+      const bg=document.getElementById('bg').value; const fg=document.getElementById('fg').value; const shape=document.getElementById('shape').value; const fontSize=parseInt(document.getElementById('fontSize').value||'128',10);
+      const canvas=document.createElement('canvas'); canvas.width=canvas.height=size; const ctx=canvas.getContext('2d');
+      if(shape!=='transparent'){ ctx.fillStyle=bg; if(shape==='circle'){ ctx.beginPath(); ctx.arc(size/2,size/2,size/2,0,Math.PI*2); ctx.fill(); } else { ctx.fillRect(0,0,size,size); } }
+      ctx.fillStyle=fg; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font=`${fontSize*(size/256)}px system-ui,Segoe UI,Arial,emoji`;
+      ctx.fillText(text, size/2, size/2);
+      return canvas;
+    }
+    function generate(){
+      generated.clear(); const sizes=[...document.querySelectorAll('.size:checked')].map(e=>parseInt(e.value,10));
+      const previews=document.getElementById('previews'); previews.innerHTML='';
+      const tags=[];
+      for(const s of sizes){
+        const c=draw(s); const url=c.toDataURL('image/png'); generated.set(s, url);
+        const card=document.createElement('div'); card.className='card'; card.innerHTML=`<div class="card-header"><div class="card-icon"><img src="${url}" alt="${s}x${s}" width="20" height="20"></div><div><h3 class="card-title">${s}x${s}</h3></div></div><div style="padding:1rem" class="flex-row"><a class="btn" href="${url}" download="favicon-${s}.png">Download</a></div>`;
+        previews.appendChild(card);
+        const rel = s>=180? 'apple-touch-icon' : 'icon';
+        tags.push(`<link rel="${rel}" sizes="${s}x${s}" href="/favicon-${s}.png">`);
+      }
+      document.getElementById('tags').value = tags.join('\n');
+    }
+    function downloadAll(){ if(!generated.size){ note('Generate first'); return;} for(const [s,url] of generated){ const a=document.createElement('a'); a.href=url; a.download=`favicon-${s}.png`; a.click(); } }
+    function copyTags(){ const t=document.getElementById('tags').value; if(!t){ note('Nothing to copy'); return;} if(window.ClipboardManager) window.ClipboardManager.copyText(t); else if(navigator.clipboard) navigator.clipboard.writeText(t); note('Copied'); }
+  </script>
+</body>
+</html>
+

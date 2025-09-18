@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cron Expression Builder - DevTools Hub</title>
+  <meta name="description" content="Build and validate cron expressions. See a plain-English description and upcoming run times. Works offline.">
+  <meta name="keywords" content="cron, cron expression, schedule, cron builder, crontab">
+  <meta name="author" content="DevTools Hub">
+  <meta name="robots" content="index, follow">
+
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="color-scheme" content="light dark">
+
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+</head>
+<body data-theme="light">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <a href="../index.html" class="logo">
+            <span class="logo-icon">🛠️</span>
+            <span>DevTools Hub</span>
+          </a>
+        </div>
+        <nav class="nav-links">
+          <a href="../index.html" class="nav-link">Home</a>
+          <a href="#" class="nav-link active" onclick="filterTools('time')">Time & Date</a>
+          <a href="world-clock.html" class="nav-link">World Clock</a>
+          <a href="countdown-timer.html" class="nav-link">Countdown</a>
+        </nav>
+        <div class="header-actions">
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+          </div>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb">
+    <div class="container">
+      <nav class="breadcrumb-nav" aria-label="Breadcrumb"></nav>
+    </div>
+  </div>
+
+  <main class="main">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-header">
+            <div class="tool-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="tool-info">
+              <h1>Cron Expression Builder</h1>
+              <p class="tool-description">Create 5‑field cron expressions (min hour day‑of‑month month day‑of‑week). See a human description and next run times.</p>
+            </div>
+          </div>
+
+          <!-- Builder -->
+          <div class="card mb-6">
+            <div class="card-header">
+              <div class="card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              </div>
+              <div>
+                <h3 class="card-title">Fields</h3>
+                <p class="card-description">Use wildcards (*), lists (1,2), ranges (1-5) and steps (*/5)</p>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="fMin">Minute</label>
+                <input id="fMin" type="text" class="form-input" value="*" placeholder="0-59, e.g., */5" oninput="buildCron()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="fHour">Hour</label>
+                <input id="fHour" type="text" class="form-input" value="*" placeholder="0-23" oninput="buildCron()">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="fDom">Day of month</label>
+                <input id="fDom" type="text" class="form-input" value="*" placeholder="1-31" oninput="buildCron()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="fMon">Month</label>
+                <input id="fMon" type="text" class="form-input" value="*" placeholder="1-12 or JAN-DEC" oninput="buildCron()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="fDow">Day of week</label>
+                <input id="fDow" type="text" class="form-input" value="*" placeholder="0-6 or SUN-SAT" oninput="buildCron()">
+              </div>
+            </div>
+
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="applyCron()">Apply to Expression</button>
+              <button class="btn btn-outline" onclick="loadPreset('hourly')">Hourly</button>
+              <button class="btn btn-outline" onclick="loadPreset('daily')">Daily</button>
+              <button class="btn btn-outline" onclick="loadPreset('weekly')">Weekly</button>
+              <button class="btn btn-outline" onclick="loadPreset('monthly')">Monthly</button>
+            </div>
+          </div>
+
+          <!-- Expression -->
+          <div class="card mb-6">
+            <div class="card-header">
+              <div class="card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg>
+              </div>
+              <div>
+                <h3 class="card-title">Cron Expression</h3>
+                <p class="card-description">Edit manually or use the builder</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cronInput">Expression (5 fields)</label>
+              <input id="cronInput" type="text" class="form-input font-mono" value="*/5 * * * *" oninput="updateAll()">
+            </div>
+            <div id="cronStatus" class="text-secondary" style="margin-top:.25rem;font-size:.875rem;"></div>
+          </div>
+
+          <!-- Results -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+              </div>
+              <div>
+                <h3 class="card-title">Description & Next Runs</h3>
+                <p class="card-description">Based on your local timezone</p>
+              </div>
+            </div>
+            <div class="result-area">
+              <div class="result-content" id="cronDescription">Every 5 minutes</div>
+              <button class="copy-btn" data-target="cronDescription">Copy</button>
+            </div>
+            <div class="grid" id="nextRuns" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-top: 1rem;"></div>
+          </div>
+        </div>
+
+        <div class="tool-sidebar">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              </div>
+              <div><h3 class="card-title">Field Help</h3></div>
+            </div>
+            <ul class="text-xs text-secondary" style="list-style:disc;padding-left:18px;">
+              <li>Minute (0-59)</li>
+              <li>Hour (0-23)</li>
+              <li>Day of month (1-31)</li>
+              <li>Month (1-12 or JAN-DEC)</li>
+              <li>Day of week (0-6 or SUN-SAT, 0=Sunday)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>DevTools Hub</h4>
+          <p>Professional developer tools that work offline. Privacy‑focused and completely free.</p>
+        </div>
+        <div class="footer-section">
+          <h4>Time & Date</h4>
+          <a href="cron-builder.html">Cron Builder</a>
+          <a href="world-clock.html">World Clock</a>
+          <a href="unix-timestamp-converter.html">Unix Timestamp</a>
+        </div>
+        <div class="footer-section">
+          <h4>Popular</h4>
+          <a href="../tools/json-formatter.html">JSON Formatter</a>
+          <a href="../tools/qr-generator.html">QR Generator</a>
+          <a href="../tools/password-generator.html">Password Generator</a>
+        </div>
+        <div class="footer-section">
+          <h4>Features</h4>
+          <span>✓ Works Offline</span>
+          <span>✓ No Data Collection</span>
+          <span>✓ Mobile Friendly</span>
+        </div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2024 DevTools Hub. Built with ❤️ for developers.</p></div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    const MON_MAP = {JAN:1,FEB:2,MAR:3,APR:4,MAY:5,JUN:6,JUL:7,AUG:8,SEP:9,OCT:10,NOV:11,DEC:12};
+    const DOW_MAP = {SUN:0,MON:1,TUE:2,WED:3,THU:4,FRI:5,SAT:6};
+
+    function loadPreset(type){
+      const presets = {
+        hourly:  { m:'0',     h:'*',   dom:'*', mon:'*', dow:'*' },
+        daily:   { m:'0',     h:'0',   dom:'*', mon:'*', dow:'*' },
+        weekly:  { m:'0',     h:'0',   dom:'*', mon:'*', dow:'0' },
+        monthly: { m:'0',     h:'0',   dom:'1', mon:'*', dow:'*' }
+      };
+      const p = presets[type]; if (!p) return;
+      document.getElementById('fMin').value = p.m;
+      document.getElementById('fHour').value = p.h;
+      document.getElementById('fDom').value = p.dom;
+      document.getElementById('fMon').value = p.mon;
+      document.getElementById('fDow').value = p.dow;
+      buildCron();
+      applyCron();
+    }
+
+    function buildCron(){
+      const m = document.getElementById('fMin').value.trim() || '*';
+      const h = document.getElementById('fHour').value.trim() || '*';
+      const dom = document.getElementById('fDom').value.trim() || '*';
+      const mon = document.getElementById('fMon').value.trim() || '*';
+      const dow = document.getElementById('fDow').value.trim() || '*';
+      const expr = `${m} ${h} ${dom} ${mon} ${dow}`;
+      document.getElementById('cronInput').value = expr;
+      updateAll();
+    }
+
+    function applyCron(){ updateAll(); }
+
+    function updateAll(){
+      const expr = document.getElementById('cronInput').value.trim();
+      const valid = validateCron(expr);
+      const status = document.getElementById('cronStatus');
+      if (!valid){
+        status.innerHTML = '<span class="text-danger">Invalid cron expression</span>';
+        document.getElementById('cronDescription').textContent = '—';
+        document.getElementById('nextRuns').innerHTML = '';
+        return;
+      }
+      status.innerHTML = '<span class="text-success">Valid</span>';
+      document.getElementById('cronDescription').textContent = cronToDescription(expr);
+      renderNextRuns(expr);
+    }
+
+    function validateCron(expr){
+      const parts = expr.split(/\s+/);
+      if (parts.length !== 5) return false;
+      const ranges = [
+        { re: /^[*,\/0-9-]+$/, min:0, max:59 },
+        { re: /^[*,\/0-9-]+$/, min:0, max:23 },
+        { re: /^[*,\/0-9-]+$/, min:1, max:31 },
+        { re: /^[*,\/0-9A-Za-z-]+$/, min:1, max:12 },
+        { re: /^[*,\/0-9A-Za-z-]+$/, min:0, max:6 }
+      ];
+      for (let i=0;i<5;i++){
+        if (!ranges[i].re.test(parts[i])) return false;
+      }
+      return true;
+    }
+
+    function cronToDescription(expr){
+      const [m,h,dom,mon,dow] = expr.split(/\s+/);
+      const desc = [];
+      // Minute
+      if (m === '*') desc.push('every minute');
+      else if (m.startsWith('*/')) desc.push(`every ${m.slice(2)} minute(s)`);
+      else desc.push(`at minute ${m}`);
+      // Hour
+      if (h === '*') desc.push('of every hour');
+      else if (h.startsWith('*/')) desc.push(`of every ${h.slice(2)} hour(s)`);
+      else desc.push(`at hour ${h}`);
+      // DOM
+      if (dom !== '*') desc.push(`on day ${dom}`);
+      // Month
+      if (mon !== '*') desc.push(`in month ${mon}`);
+      // DOW
+      if (dow !== '*') desc.push(`on weekday ${dow}`);
+      return capitalize(desc.join(' '));
+    }
+
+    function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+    function renderNextRuns(expr){
+      const list = document.getElementById('nextRuns');
+      list.innerHTML = '';
+      const max = 8; // show next 8 runs
+      const runs = nextRunTimes(expr, max);
+      const frag = document.createDocumentFragment();
+      runs.forEach(d => {
+        const card = document.createElement('div'); card.className='card';
+        card.innerHTML = `<div class="p-4"><div class="font-semibold">${d.toLocaleString()}</div><div class="text-xs text-secondary">${d.toISOString()}</div></div>`;
+        frag.appendChild(card);
+      });
+      list.appendChild(frag);
+    }
+
+    function nextRunTimes(expr, count){
+      const [mExp,hExp,domExp,monExp,dowExp] = expr.split(/\s+/);
+      const start = new Date();
+      start.setSeconds(0,0);
+      let d = new Date(start.getTime() + 60000); // next minute
+      const results = [];
+      let guard = 0; // prevents infinite loops
+      while (results.length < count && guard < 525600) { // up to 1 year of minutes
+        if (matches(d.getMinutes(), mExp, 0, 59) &&
+            matches(d.getHours(), hExp, 0, 23) &&
+            matches(d.getDate(), domExp, 1, 31) &&
+            matches(toMonth(d), monExp, 1, 12) &&
+            matches(d.getDay(), dowExp, 0, 6)) {
+          results.push(new Date(d));
+        }
+        d = new Date(d.getTime() + 60000);
+        guard++;
+      }
+      return results;
+    }
+
+    function toMonth(date){ return date.getMonth()+1; }
+
+    function normalizeToken(token, map){
+      token = token.toUpperCase();
+      if (map && map[token] != null) return String(map[token]);
+      return token;
+    }
+
+    function matches(value, expr, min, max){
+      expr = expr.toUpperCase();
+      if (expr === '*') return true;
+      // Replace month/day names
+      expr = expr.replace(/[A-Z]{3}/g, m => {
+        if (MON_MAP[m] != null) return MON_MAP[m];
+        if (DOW_MAP[m] != null) return DOW_MAP[m];
+        return m;
+      });
+
+      // Handle lists
+      return expr.split(',').some(part => {
+        part = part.trim();
+        if (part === '*') return true;
+        // steps
+        const stepIdx = part.indexOf('/');
+        let base = part, step = 1;
+        if (stepIdx !== -1){
+          base = part.slice(0, stepIdx) || '*';
+          step = parseInt(part.slice(stepIdx+1), 10) || 1;
+        }
+        // range or wildcard
+        if (base === '*'){
+          return (value - min) % step === 0;
+        }
+        const rangeIdx = base.indexOf('-');
+        if (rangeIdx !== -1){
+          const a = parseInt(base.slice(0,rangeIdx),10);
+          const b = parseInt(base.slice(rangeIdx+1),10);
+          if (isNaN(a)||isNaN(b)) return false;
+          if (value < a || value > b) return false;
+          return (value - a) % step === 0;
+        }
+        const num = parseInt(base,10);
+        if (isNaN(num)) return false;
+        return (value === num);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateAll();
+    });
+  </script>
+</body>
+</html>
+

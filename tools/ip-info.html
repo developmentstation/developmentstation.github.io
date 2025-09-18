@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IP Info - DevTools Hub</title>
+  <meta name="description" content="Get your public IP and geolocation. Multiple providers with graceful fallbacks.">
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+  <meta name="color-scheme" content="light dark">
+</head>
+<body data-theme="light">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <a href="../index.html" class="logo"><span class="logo-icon">🛠️</span><span>DevTools Hub</span></a>
+        </div>
+        <nav class="nav-links">
+          <a href="../index.html" class="nav-link">Home</a>
+          <a href="#" class="nav-link active">Network</a>
+        </nav>
+        <div class="header-actions">
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-header">
+            <div class="tool-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div class="tool-info"><h1>IP Info</h1><p class="tool-description">Retrieve your public IP and related info with fallback providers.</p></div>
+          </div>
+
+          <div class="card mb-6">
+            <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><div><h3 class="card-title">Actions</h3></div></div>
+            <div class="btn-group" style="padding:1rem"><button class="btn btn-primary" onclick="lookup()">Lookup</button><button class="btn" onclick="copyOut()">Copy JSON</button><button class="btn btn-ghost" onclick="clearOut()">Clear</button></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-icon"><div style="width:20px;height:20px;border-radius:50%;background:var(--primary)"></div></div><div><h3 class="card-title">Result</h3></div></div>
+            <div class="form-group" style="padding:1rem"><textarea id="out" class="form-textarea" rows="16" placeholder="Result will appear here..."></textarea></div>
+          </div>
+        </div>
+        <div class="tool-sidebar">
+          <div class="card"><div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><div><h3 class="card-title">Providers</h3></div></div>
+            <ul class="text-sm text-secondary" style="list-style:disc;padding:1rem 1rem 1rem 1.25rem;">
+              <li>ipapi.co/json</li>
+              <li>api.ipify.org?format=json</li>
+              <li>ipinfo.io/json</li>
+              <li>Fallback: limited local info</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section"><h4>DevTools Hub</h4><p>Professional developer tools that work offline.</p></div>
+        <div class="footer-section"><h4>Network</h4><a href="ip-info.html">IP Info</a><a href="user-agent.html">User-Agent</a></div>
+        <div class="footer-section"><h4>Popular</h4><a href="../tools/json-formatter.html">JSON</a><a href="../tools/qr-generator.html">QR</a></div>
+        <div class="footer-section"><h4>Features</h4><span>✓ Offline</span></div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2024 DevTools Hub.</p></div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    function clearOut(){ document.getElementById('out').value=''; }
+    function note(m){ if(window.ToastManager) window.ToastManager.show(m); else alert(m); }
+    function copyOut(){ const t=document.getElementById('out').value; if(!t){ note('Nothing to copy'); return;} if(window.ClipboardManager) window.ClipboardManager.copyText(t); else if(navigator.clipboard) navigator.clipboard.writeText(t); note('Copied'); }
+    async function tryFetch(url){ try{ const r=await fetch(url,{mode:'cors'}); if(!r.ok) throw new Error(r.status); return await r.json(); }catch{ return null; } }
+    async function lookup(){
+      let data = await tryFetch('https://ipapi.co/json/');
+      if(!data) data = await tryFetch('https://api.ipify.org?format=json');
+      if(!data) data = await tryFetch('https://ipinfo.io/json');
+      if(!data){
+        data = { error: 'offline or blocked', userAgent: navigator.userAgent, languages: navigator.languages, platform: navigator.platform, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone };
+      }
+      document.getElementById('out').value = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
+

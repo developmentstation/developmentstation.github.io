@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JWT Decoder & Verifier - DevTools Hub</title>
+  <meta name="description" content="Decode and verify JSON Web Tokens (JWT). View header, payload, signature. Verify HS256/384/512 with secret and RS256/384/512 with PEM public key. Works offline.">
+  <meta name="keywords" content="jwt, jwt decoder, jwt verifier, hs256, rs256">
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+</head>
+<body data-theme="light">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <a href="../index.html" class="logo"><span class="logo-icon">🛠️</span><span>DevTools Hub</span></a>
+        </div>
+        <nav class="nav-links">
+          <a href="../index.html" class="nav-link">Home</a>
+          <a href="#" class="nav-link active">Security</a>
+          <a href="hash-generator.html" class="nav-link">Hashes</a>
+          <a href="password-generator.html" class="nav-link">Passwords</a>
+        </nav>
+        <div class="header-actions">
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb"><div class="container"><nav class="breadcrumb-nav" aria-label="Breadcrumb"></nav></div></div>
+
+  <main class="main">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-header">
+            <div class="tool-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1l9 4v6c0 5-4 9-9 10C7 20 3 16 3 11V5l9-4z"/><path d="M9 12l2 2 4-4"/></svg></div>
+            <div class="tool-info"><h1>JWT Decoder & Verifier</h1><p class="tool-description">Decode header/payload, inspect claims, and verify signatures (HS/RS).</p></div>
+          </div>
+
+          <div class="card mb-6">
+            <div class="card-header">
+              <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M3 9h18"/></svg></div>
+              <div>
+                <h3 class="card-title">Token</h3>
+                <p class="card-description">Paste your JWT below (three base64url parts separated by dots)</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="jwtInput">JWT</label>
+              <textarea id="jwtInput" class="form-textarea" rows="6" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoxNzAwMDAwMDAwfQ.QWJjZGVm..."></textarea>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="decodeJWT()">Decode</button>
+              <button class="btn" onclick="verifyJWT()">Verify</button>
+              <button class="btn btn-ghost" onclick="clearJWT()">Clear</button>
+              <button class="btn btn-ghost" onclick="copyToken()">Copy token</button>
+            </div>
+          </div>
+
+          <div class="card mb-6">
+            <div class="card-header">
+              <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4"/><path d="M20 12H4"/><path d="M20 17H4"/></svg></div>
+              <div>
+                <h3 class="card-title">Decoded</h3>
+                <p class="card-description">Header, Payload, and Signature</p>
+              </div>
+            </div>
+            <div class="grid" style="grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1rem; padding: 1rem;">
+              <div class="result-area">
+                <div class="result-content" style="overflow:auto">
+                  <div class="flex-row" style="justify-content:space-between; align-items:center; gap:.5rem;">
+                    <strong>Header</strong>
+                    <button class="copy-btn" data-copy="pre-header">Copy</button>
+                  </div>
+                  <pre id="pre-header" class="code-block" style="max-height:260px"></pre>
+                </div>
+              </div>
+              <div class="result-area">
+                <div class="result-content" style="overflow:auto">
+                  <div class="flex-row" style="justify-content:space-between; align-items:center; gap:.5rem;">
+                    <strong>Payload</strong>
+                    <button class="copy-btn" data-copy="pre-payload">Copy</button>
+                  </div>
+                  <pre id="pre-payload" class="code-block" style="max-height:260px"></pre>
+                </div>
+              </div>
+              <div class="result-area">
+                <div class="result-content" style="overflow:auto">
+                  <div class="flex-row" style="justify-content:space-between; align-items:center; gap:.5rem;">
+                    <strong>Signature</strong>
+                    <button class="copy-btn" data-copy="pre-signature">Copy</button>
+                  </div>
+                  <pre id="pre-signature" class="code-block" style="max-height:260px"></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mb-6">
+            <div class="card-header">
+              <div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              <div>
+                <h3 class="card-title">Verification</h3>
+                <p class="card-description">Validate the signature and token time claims</p>
+              </div>
+              <div id="verify-status" class="badge" style="margin-left:auto">Status: —</div>
+            </div>
+            <div class="grid" style="grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; padding: 1rem;">
+              <div>
+                <div class="form-group">
+                  <label class="form-label">Algorithm (from header)</label>
+                  <input id="algDetected" class="form-input" type="text" placeholder="—" readonly>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">HMAC Secret (for HS256/384/512)</label>
+                  <input id="hmacSecret" class="form-input" type="text" placeholder="Enter shared secret to verify HMAC">
+                </div>
+              </div>
+              <div>
+                <div class="form-group">
+                  <label class="form-label">RSA Public Key (PEM) for RS256/384/512</label>
+                  <textarea id="rsaPublicPem" class="form-textarea" rows="6" placeholder="-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A...\n-----END PUBLIC KEY-----"></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="grid" style="grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1rem; padding: 0 1rem 1rem;">
+              <div class="form-group"><label class="form-label">exp</label><input id="claim-exp" class="form-input" type="text" readonly></div>
+              <div class="form-group"><label class="form-label">nbf</label><input id="claim-nbf" class="form-input" type="text" readonly></div>
+              <div class="form-group"><label class="form-label">iat</label><input id="claim-iat" class="form-input" type="text" readonly></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tool-sidebar">
+          <div class="card">
+            <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><h3 class="card-title">Tips</h3></div></div>
+            <ul class="text-xs text-secondary" style="list-style:disc;padding-left:18px;">
+              <li>Works offline. All decoding is local to your browser.</li>
+              <li>For HS256/384/512, enter your shared secret to verify.</li>
+              <li>For RS256/384/512, paste a PEM public key to verify.</li>
+              <li>Time claims (exp/nbf/iat) are shown in your local timezone.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section"><h4>DevTools Hub</h4><p>Professional developer tools that work offline.</p></div>
+        <div class="footer-section"><h4>Security</h4><a href="jwt-decoder.html">JWT Decoder</a><a href="hash-generator.html">Hashes</a><a href="password-generator.html">Passwords</a></div>
+        <div class="footer-section"><h4>Popular</h4><a href="../tools/json-formatter.html">JSON</a><a href="../tools/qr-generator.html">QR</a></div>
+        <div class="footer-section"><h4>Features</h4><span>✓ Offline</span></div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2024 DevTools Hub.</p></div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    // UI helpers
+    function clearJWT(){
+      document.getElementById('jwtInput').value = '';
+      setText('pre-header','');
+      setText('pre-payload','');
+      setText('pre-signature','');
+      setText('algDetected','');
+      setBadge('verify-status','Status: —','neutral');
+      setText('claim-exp',''); setText('claim-nbf',''); setText('claim-iat','');
+    }
+    function copyToken(){
+      const t = document.getElementById('jwtInput').value.trim();
+      if(!t){ notify('Nothing to copy'); return; }
+      copyToClipboard(t);
+    }
+    function setText(id, text){ const el = document.getElementById(id); if(!el) return; if(el.tagName === 'INPUT' || el.tagName==='TEXTAREA') el.value = text; else el.textContent = text; }
+    function notify(msg){ if(window.ToastManager) window.ToastManager.show(msg); else alert(msg); }
+    function setBadge(id, text, type){ const el = document.getElementById(id); if(!el) return; el.textContent = text; el.classList.remove('success','warning','danger'); if(type==='success') el.classList.add('success'); else if(type==='warning') el.classList.add('warning'); else if(type==='danger') el.classList.add('danger'); }
+    function copyToClipboard(text){ if(window.ClipboardManager) window.ClipboardManager.copyText(text); else if(navigator.clipboard) navigator.clipboard.writeText(text); }
+
+    // Base64url helpers
+    function b64urlToBytes(b64url){
+      let str = b64url.replace(/-/g,'+').replace(/_/g,'/');
+      const pad = str.length % 4; if (pad) str += '='.repeat(4-pad);
+      const bin = atob(str);
+      const arr = new Uint8Array(bin.length);
+      for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+      return arr;
+    }
+    function bytesToB64url(bytes){
+      let bin = '';
+      for(let i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i]);
+      let b64 = btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+      return b64;
+    }
+
+    // Decode flow
+    function decodeJWT(){
+      const token = document.getElementById('jwtInput').value.trim();
+      if(!token){ notify('Please paste a JWT'); return; }
+      const parts = token.split('.');
+      if(parts.length !== 3){ notify('Invalid token format (expect 3 parts)'); return; }
+      const [h, p, s] = parts;
+      try{
+        const header = JSON.parse(new TextDecoder().decode(b64urlToBytes(h)) || '{}');
+        const payload = JSON.parse(new TextDecoder().decode(b64urlToBytes(p)) || '{}');
+        setText('pre-header', JSON.stringify(header, null, 2));
+        setText('pre-payload', JSON.stringify(payload, null, 2));
+        setText('pre-signature', s);
+        setText('algDetected', header.alg || '');
+        updateClaimTimes(payload);
+        // Soft validity from time claims
+        const status = computeTimeStatus(payload);
+        if(status === 'valid') setBadge('verify-status','Time status: valid','success');
+        else if(status === 'not yet valid') setBadge('verify-status','Time status: not yet valid','warning');
+        else if(status === 'expired') setBadge('verify-status','Time status: expired','danger');
+        else setBadge('verify-status','Status: —','neutral');
+      }catch(e){
+        notify('Failed to decode JWT: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    function updateClaimTimes(payload){
+      const exp = toTimeString(payload.exp);
+      const nbf = toTimeString(payload.nbf);
+      const iat = toTimeString(payload.iat);
+      setText('claim-exp', exp);
+      setText('claim-nbf', nbf);
+      setText('claim-iat', iat);
+    }
+    function toTimeString(sec){
+      if(!sec && sec !== 0) return '';
+      const d = new Date(sec * 1000);
+      if(isNaN(d.getTime())) return String(sec);
+      return d.toLocaleString();
+    }
+    function computeTimeStatus(payload){
+      const now = Math.floor(Date.now()/1000);
+      if(typeof payload.nbf === 'number' && now < payload.nbf) return 'not yet valid';
+      if(typeof payload.exp === 'number' && now >= payload.exp) return 'expired';
+      if(payload.exp || payload.nbf) return 'valid';
+      return 'unknown';
+    }
+
+    // Verification
+    async function verifyJWT(){
+      const token = document.getElementById('jwtInput').value.trim();
+      if(!token){ notify('Paste a JWT first'); return; }
+      const parts = token.split('.');
+      if(parts.length !== 3){ notify('Invalid token format'); return; }
+      const [h, p, s] = parts;
+      let header;
+      try{ header = JSON.parse(new TextDecoder().decode(b64urlToBytes(h)) || '{}'); }catch{ notify('Invalid header'); return; }
+      const alg = (header.alg || '').toUpperCase();
+      setText('algDetected', alg);
+
+      const data = new TextEncoder().encode(h + '.' + p);
+      const sigBytes = b64urlToBytes(s);
+
+      try{
+        if(alg.startsWith('HS')){
+          const bits = parseInt(alg.slice(2), 10);
+          if(![256,384,512].includes(bits)) throw new Error('Unsupported HMAC alg');
+          const secret = document.getElementById('hmacSecret').value;
+          if(!secret){ notify('Enter HMAC secret'); return; }
+          const ok = await verifyHmac(bits, secret, data, sigBytes);
+          setBadge('verify-status', ok? 'Signature: valid' : 'Signature: invalid', ok? 'success':'danger');
+          return;
+        }
+        if(alg.startsWith('RS')){
+          const bits = parseInt(alg.slice(2), 10);
+          if(![256,384,512].includes(bits)) throw new Error('Unsupported RSA alg');
+          const pem = document.getElementById('rsaPublicPem').value.trim();
+          if(!pem){ notify('Paste RSA public key (PEM)'); return; }
+          const ok = await verifyRsa(bits, pem, data, sigBytes);
+          setBadge('verify-status', ok? 'Signature: valid' : 'Signature: invalid', ok? 'success':'danger');
+          return;
+        }
+        notify('Unsupported algorithm: ' + alg + '. Supported: HS256/384/512, RS256/384/512');
+      }catch(e){
+        setBadge('verify-status','Verification error','danger');
+        notify('Verify error: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    async function verifyHmac(bits, secret, data, sigBytes){
+      const key = await crypto.subtle.importKey(
+        'raw',
+        new TextEncoder().encode(secret),
+        { name: 'HMAC', hash: { name: 'SHA-' + bits } },
+        false,
+        ['sign']
+      );
+      const sig = new Uint8Array(await crypto.subtle.sign('HMAC', key, data));
+      return timingSafeEqual(sig, sigBytes);
+    }
+
+    async function verifyRsa(bits, pem, data, sigBytes){
+      const spki = pemToArrayBuffer(pem);
+      const key = await crypto.subtle.importKey(
+        'spki',
+        spki,
+        { name: 'RSASSA-PKCS1-v1_5', hash: { name: 'SHA-' + bits } },
+        false,
+        ['verify']
+      );
+      return await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, sigBytes, data);
+    }
+
+    function pemToArrayBuffer(pem){
+      const clean = pem.replace(/-----BEGIN PUBLIC KEY-----/g,'')
+                       .replace(/-----END PUBLIC KEY-----/g,'')
+                       .replace(/\s+/g,'');
+      const bin = atob(clean);
+      const arr = new Uint8Array(bin.length);
+      for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+      return arr.buffer;
+    }
+
+    function timingSafeEqual(a, b){
+      if(a.length !== b.length) return false;
+      let out = 0;
+      for(let i=0;i<a.length;i++) out |= a[i] ^ b[i];
+      return out === 0;
+    }
+
+    // Copy buttons in decoded grid
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('[data-copy]');
+      if(!btn) return;
+      const id = btn.getAttribute('data-copy');
+      const el = document.getElementById(id);
+      if(!el) return;
+      copyToClipboard(el.textContent);
+      notify('Copied');
+    });
+  </script>
+</body>
+</html>
+

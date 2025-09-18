@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Formatter & Minifier - DevTools Hub</title>
+    <meta name="description" content="Format and minify SQL queries with keyword uppercasing and indentation options. Works offline.">
+    <meta name="keywords" content="sql formatter, sql beautifier, sql minifier, format sql, prettify sql">
+    <meta name="author" content="DevTools Hub">
+    <meta name="robots" content="index, follow">
+
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="color-scheme" content="light dark">
+
+    <link rel="stylesheet" href="../assets/css/modern-styles.css">
+</head>
+<body data-theme="light">
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <a href="../index.html" class="logo">
+                        <span class="logo-icon">🛠️</span>
+                        <span>DevTools Hub</span>
+                    </a>
+                </div>
+                <nav class="nav-links">
+                    <a href="../index.html" class="nav-link">Home</a>
+                    <a href="#" class="nav-link active" onclick="filterTools('data')">Data Tools</a>
+                    <a href="json-formatter.html" class="nav-link">JSON</a>
+                    <a href="csv-converter.html" class="nav-link">CSV</a>
+                </nav>
+                <div class="header-actions">
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+                        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.35-4.35"/>
+                        </svg>
+                    </div>
+                    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">
+                        <span id="themeIcon">🌙</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="breadcrumb">
+        <div class="container">
+            <nav class="breadcrumb-nav" aria-label="Breadcrumb"></nav>
+        </div>
+    </div>
+
+    <main class="main">
+        <div class="container">
+            <div class="tool-layout">
+                <div class="tool-content">
+                    <div class="tool-header">
+                        <div class="tool-icon">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                                <path d="M3 5v6c0 1.7 4 3 9 3s9-1.3 9-3V5"/>
+                                <path d="M3 11v6c0 1.7 4 3 9 3s9-1.3 9-3v-6"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <h1>SQL Formatter & Minifier</h1>
+                            <p class="tool-description">Clean up SQL with smart indentation, keyword casing, and compact minification.</p>
+                        </div>
+                    </div>
+
+                    <div class="card mb-6">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">SQL Input</h3>
+                                <p class="card-description">Paste your SQL here</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="sqlInput" class="form-label">Query</label>
+                            <textarea id="sqlInput" class="form-textarea font-mono" rows="12" placeholder="SELECT id, name FROM users WHERE active = 1 ORDER BY name;"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="indentSize">Indent size</label>
+                                <select id="indentSize" class="form-select">
+                                    <option value="2" selected>2 spaces</option>
+                                    <option value="4">4 spaces</option>
+                                    <option value="\t">Tab</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Options</label>
+                                <label class="checkbox-item">
+                                    <input type="checkbox" id="uppercaseKw" checked>
+                                    <span class="checkmark"></span>
+                                    <span>Uppercase keywords</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="formatSQL()">Format</button>
+                            <button class="btn btn-secondary" onclick="minifySQL()">Minify</button>
+                            <button class="btn btn-outline" onclick="loadExample()">Load Example</button>
+                            <button class="btn btn-ghost" onclick="clearSQL()">Clear</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Output</h3>
+                                <p class="card-description">Formatted result</p>
+                            </div>
+                        </div>
+                        <div class="result-area">
+                            <textarea id="sqlOutput" class="form-textarea font-mono" rows="12" readonly placeholder="Formatted SQL will appear here..."></textarea>
+                            <button class="copy-btn" data-target="sqlOutput">Copy</button>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-outline" onclick="downloadSQL()">Download .sql</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-sidebar">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Tips</h3>
+                            </div>
+                        </div>
+                        <ul class="text-xs text-secondary" style="list-style: disc; padding-left: 18px;">
+                            <li>Semicolons split statements</li>
+                            <li>Indentation increases inside parentheses</li>
+                            <li>Line breaks before major clauses (SELECT/WHERE/JOIN/…)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>DevTools Hub</h4>
+                    <p>Professional developer tools that work offline. Privacy-focused and completely free.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Data Tools</h4>
+                    <a href="json-formatter.html">JSON Formatter</a>
+                    <a href="csv-converter.html">CSV Converter</a>
+                    <a href="sql-formatter.html">SQL Formatter</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Popular</h4>
+                    <a href="../tools/qr-generator.html">QR Generator</a>
+                    <a href="../tools/password-generator.html">Password Generator</a>
+                    <a href="../tools/unix-timestamp-converter.html">Unix Timestamp</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Features</h4>
+                    <span>✓ Works Offline</span>
+                    <span>✓ No Data Collection</span>
+                    <span>✓ Mobile Friendly</span>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 DevTools Hub. Built with ❤️ for developers.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/modern-shared.js"></script>
+    <script>
+        const KW = [
+            'SELECT','FROM','WHERE','GROUP BY','ORDER BY','HAVING','LIMIT','OFFSET','JOIN','LEFT JOIN','RIGHT JOIN','FULL JOIN','INNER JOIN','OUTER JOIN','CROSS JOIN','ON','UNION','UNION ALL','INSERT','INTO','VALUES','UPDATE','SET','DELETE','CREATE','ALTER','DROP','TRUNCATE','DISTINCT','CASE','WHEN','THEN','ELSE','END','AND','OR','NOT','IN','IS','NULL','LIKE','BETWEEN','EXISTS','AS'
+        ];
+
+        function loadExample() {
+            const ex = `SELECT u.id, u.name, COUNT(p.id) posts\nFROM users u\nLEFT JOIN posts p ON p.user_id = u.id\nWHERE u.active = 1 AND (u.country = 'US' OR u.country = 'CA')\nGROUP BY u.id, u.name\nHAVING COUNT(p.id) > 0\nORDER BY u.name ASC;`;
+            document.getElementById('sqlInput').value = ex;
+        }
+
+        function clearSQL(){
+            document.getElementById('sqlInput').value = '';
+            document.getElementById('sqlOutput').value = '';
+        }
+
+        function downloadSQL(){
+            const out = document.getElementById('sqlOutput').value;
+            if (!out) { if (window.ToastManager) window.ToastManager.info('Nothing to download'); return; }
+            FileManager.downloadText(out, 'formatted.sql', 'application/sql');
+        }
+
+        function formatSQL(){
+            const input = document.getElementById('sqlInput').value;
+            const indentVal = document.getElementById('indentSize').value;
+            const indentUnit = indentVal === '\\t' ? '\\t' : ' '.repeat(parseInt(indentVal, 10));
+            const uppercase = document.getElementById('uppercaseKw').checked;
+            const out = prettyFormatSQL(input, { indentUnit, uppercase });
+            document.getElementById('sqlOutput').value = out;
+        }
+
+        function minifySQL(){
+            const input = document.getElementById('sqlInput').value;
+            const out = input
+                .replace(/--[^\n]*\n/g, ' ')            // line comments
+                .replace(/\/\*[\s\S]*?\*\//g, ' ')     // block comments
+                .replace(/\s+/g, ' ')                    // collapse whitespace
+                .replace(/\s*;\s*/g, ';')               // tidy semicolons
+                .trim();
+            document.getElementById('sqlOutput').value = out;
+        }
+
+        function prettyFormatSQL(sql, { indentUnit, uppercase }){
+            if (!sql.trim()) return '';
+            // Remove comments, but preserve line breaks around block areas for readability
+            let s = sql
+                .replace(/--[^\n]*\n/g, '\n')
+                .replace(/\/\*[\s\S]*?\*\//g, ' ');
+
+            // Normalize spaces
+            s = s.replace(/\r\n?|\n/g, '\n').replace(/\t/g, '    ');
+
+            // Break before major clauses
+            const clause = /(\bSELECT\b|\bFROM\b|\bWHERE\b|\bGROUP\s+BY\b|\bORDER\s+BY\b|\bHAVING\b|\bJOIN\b|\bLEFT\s+JOIN\b|\bRIGHT\s+JOIN\b|\bINNER\s+JOIN\b|\bOUTER\s+JOIN\b|\bCROSS\s+JOIN\b|\bUNION\b|\bUNION\s+ALL\b|\bINSERT\b|\bUPDATE\b|\bDELETE\b|\bVALUES\b|\bSET\b|\bLIMIT\b|\bOFFSET\b)/gi;
+            s = s.replace(clause, '\n$1');
+
+            // Line breaks after commas in SELECT lists
+            s = s.replace(/,(\s*)(?![^\(]*\))/g, ',\n');
+
+            // Split into tokens by lines and parentheses
+            const lines = s.split(/\n+/).map(l => l.trim()).filter(Boolean);
+            let out = '';
+            let depth = 0;
+
+            const incBefore = /^(FROM|WHERE|GROUP\s+BY|ORDER\s+BY|HAVING|JOIN|LEFT\s+JOIN|RIGHT\s+JOIN|INNER\s+JOIN|OUTER\s+JOIN|CROSS\s+JOIN|UNION|UNION\s+ALL|VALUES|SET|LIMIT|OFFSET)\b/i;
+
+            for (let line of lines){
+                // manage parenthesis depth
+                const open = (line.match(/\(/g)||[]).length;
+                const close = (line.match(/\)/g)||[]).length;
+
+                if (close > open){
+                    depth = Math.max(0, depth - (close - open));
+                }
+
+                const pad = indentUnit.repeat(depth);
+
+                // Uppercase keywords optionally
+                if (uppercase){
+                    for (const k of KW){
+                        const re = new RegExp('\\b' + k.replace(/\s+/g,'\\s+') + '\\b','ig');
+                        line = line.replace(re, k);
+                    }
+                }
+
+                out += pad + line + '\n';
+
+                if (open > close){
+                    depth += (open - close);
+                } else if (incBefore.test(line)) {
+                    // Slight additional indentation for following details
+                    // keeps JOIN/WHERE blocks readable
+                    // depth unaffected here; formatting is already applied by clause breaks
+                }
+            }
+
+            // Tidy blank lines and spaces
+            out = out.replace(/\n{3,}/g,'\n\n').replace(/[ \t]+\n/g,'\n').trim() + '\n';
+            return out;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Optional: preload example
+        });
+    </script>
+</body>
+</html>
+

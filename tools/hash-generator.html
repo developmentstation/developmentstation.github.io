@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hash Generator - DevTools Hub</title>
+  <meta name="description" content="Generate MD5, SHA‑1, SHA‑256, SHA‑384 and SHA‑512 hashes for text or files. Works offline.">
+  <meta name="keywords" content="hash generator, MD5, SHA-1, SHA-256, SHA-384, SHA-512">
+  <meta name="author" content="DevTools Hub">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="color-scheme" content="light dark">
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+</head>
+<body data-theme="light">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <a href="../index.html" class="logo"><span class="logo-icon">🛠️</span><span>DevTools Hub</span></a>
+        </div>
+        <nav class="nav-links">
+          <a href="../index.html" class="nav-link">Home</a>
+          <a href="#" class="nav-link active" onclick="filterTools('security')">Security</a>
+          <a href="password-generator.html" class="nav-link">Passwords</a>
+          <a href="base64-encoder.html" class="nav-link">Base64</a>
+        </nav>
+        <div class="header-actions">
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="breadcrumb"><div class="container"><nav class="breadcrumb-nav" aria-label="Breadcrumb"></nav></div></div>
+
+  <main class="main">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-header">
+            <div class="tool-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4v6c0 5-4 9-9 10C7 21 3 17 3 12V6l9-4z"/></svg></div>
+            <div class="tool-info"><h1>Hash Generator</h1><p class="tool-description">Generate MD5, SHA‑1, SHA‑256, SHA‑384, SHA‑512 for text or files.</p></div>
+          </div>
+
+          <div class="card mb-6">
+            <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div><h3 class="card-title">Input</h3><p class="card-description">Enter text or choose a file</p></div></div>
+            <div class="form-group"><label class="form-label" for="hashInput">Text</label><textarea id="hashInput" class="form-textarea" rows="6" placeholder="Type text to hash..."></textarea></div>
+            <div class="form-group"><label class="form-label" for="hashFile">File</label><input id="hashFile" type="file" class="form-input"></div>
+            <div class="btn-group"><button class="btn btn-primary" onclick="generateAll()">Generate All</button><button class="btn btn-ghost" onclick="clearAll()">Clear</button></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg></div><div><h3 class="card-title">Hashes</h3></div></div>
+            <div class="grid" style="grid-template-columns: 1fr; gap: .75rem; padding: 1rem;">
+              <div class="result-area"><div class="result-content" id="h-md5">MD5: —</div><button class="copy-btn" data-target="h-md5">Copy</button></div>
+              <div class="result-area"><div class="result-content" id="h-sha1">SHA‑1: —</div><button class="copy-btn" data-target="h-sha1">Copy</button></div>
+              <div class="result-area"><div class="result-content" id="h-sha256">SHA‑256: —</div><button class="copy-btn" data-target="h-sha256">Copy</button></div>
+              <div class="result-area"><div class="result-content" id="h-sha384">SHA‑384: —</div><button class="copy-btn" data-target="h-sha384">Copy</button></div>
+              <div class="result-area"><div class="result-content" id="h-sha512">SHA‑512: —</div><button class="copy-btn" data-target="h-sha512">Copy</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tool-sidebar">
+          <div class="card"><div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><div><h3 class="card-title">Notes</h3></div></div>
+            <ul class="text-xs text-secondary" style="list-style:disc;padding-left:18px;">
+              <li>SHA algorithms use Web Crypto (subtle.digest).</li>
+              <li>MD5 is included for compatibility only; avoid for security.</li>
+              <li>All hashing runs locally in your browser.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section"><h4>DevTools Hub</h4><p>Professional developer tools that work offline.</p></div>
+        <div class="footer-section"><h4>Security</h4><a href="hash-generator.html">Hash Generator</a><a href="password-generator.html">Password Generator</a></div>
+        <div class="footer-section"><h4>Popular</h4><a href="../tools/json-formatter.html">JSON</a><a href="../tools/qr-generator.html">QR</a></div>
+        <div class="footer-section"><h4>Features</h4><span>✓ Offline</span></div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2024 DevTools Hub.</p></div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    function clearAll(){ document.getElementById('hashInput').value=''; document.getElementById('hashFile').value=''; setAll('—'); }
+    function setAll(text){ set('h-md5','MD5: '+text); set('h-sha1','SHA‑1: '+text); set('h-sha256','SHA‑256: '+text); set('h-sha384','SHA‑384: '+text); set('h-sha512','SHA‑512: '+text); }
+    function set(id, value){ document.getElementById(id).textContent = value; }
+
+    async function generateAll(){
+      const file = document.getElementById('hashFile').files[0];
+      if (file){
+        const ab = await file.arrayBuffer();
+        await computeFromArrayBuffer(ab);
+      } else {
+        const text = document.getElementById('hashInput').value || '';
+        const data = new TextEncoder().encode(text);
+        await computeFromArrayBuffer(data.buffer);
+      }
+    }
+
+    async function computeFromArrayBuffer(buf){
+      // SHA family via Web Crypto
+      const sha1 = await crypto.subtle.digest('SHA-1', buf).catch(()=>null);
+      const sha256 = await crypto.subtle.digest('SHA-256', buf).catch(()=>null);
+      const sha384 = await crypto.subtle.digest('SHA-384', buf).catch(()=>null);
+      const sha512 = await crypto.subtle.digest('SHA-512', buf).catch(()=>null);
+
+      set('h-sha1','SHA‑1: '+ (sha1? toHex(new Uint8Array(sha1)) : 'unsupported'));
+      set('h-sha256','SHA‑256: '+ (sha256? toHex(new Uint8Array(sha256)) : 'unsupported'));
+      set('h-sha384','SHA‑384: '+ (sha384? toHex(new Uint8Array(sha384)) : 'unsupported'));
+      set('h-sha512','SHA‑512: '+ (sha512? toHex(new Uint8Array(sha512)) : 'unsupported'));
+
+      // MD5 (JS implementation)
+      const md5hex = md5(new Uint8Array(buf));
+      set('h-md5','MD5: '+md5hex);
+    }
+
+    function toHex(arr){ return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+    // ----------------------
+    // Minimal MD5 (Uint8Array input) – public domain implementation
+    // ----------------------
+    function md5(bytes){
+      // Convert to little‑endian 32‑bit words
+      const origLen = bytes.length;
+      const withOne = new Uint8Array(((origLen + 9 + 63) >> 6) << 6);
+      withOne.set(bytes);
+      withOne[origLen] = 0x80;
+      const bitLen = origLen * 8;
+      const dv = new DataView(withOne.buffer);
+      dv.setUint32(withOne.length - 8, bitLen >>> 0, true);
+      dv.setUint32(withOne.length - 4, Math.floor(bitLen / 0x100000000) >>> 0, true);
+
+      let a=0x67452301, b=0xefcdab89, c=0x98badcfe, d=0x10325476;
+      const S = [7,12,17,22, 5,9,14,20, 4,11,16,23, 6,10,15,21];
+      const K = new Uint32Array(64);
+      for (let i=0;i<64;i++) K[i] = Math.floor(Math.abs(Math.sin(i+1))*0x100000000)>>>0;
+      function F(x,y,z){ return (x & y) | (~x & z); }
+      function G(x,y,z){ return (x & z) | (y & ~z); }
+      function H(x,y,z){ return x ^ y ^ z; }
+      function I(x,y,z){ return y ^ (x | ~z); }
+      function rotl(x,s){ return (x<<s) | (x>>> (32-s)); }
+      function step(func, a,b,c,d,x,s,i){ return (b + rotl((a + func(b,c,d) + x + K[i])>>>0, s))>>>0; }
+
+      for (let i=0;i<withOne.length;i+=64){
+        const X = new Uint32Array(16);
+        for (let j=0;j<16;j++) X[j] = dv.getUint32(i + j*4, true);
+        let aa=a, bb=b, cc=c, dd=d;
+
+        for (let j=0;j<64;j++){
+          let div16 = j>>4;
+          let f, g;
+          if (div16===0){ f=F; g=j; }
+          else if (div16===1){ f=G; g=(5*j+1)%16; }
+          else if (div16===2){ f=H; g=(3*j+5)%16; }
+          else { f=I; g=(7*j)%16; }
+          const sIdx = (div16*4) + (j%4);
+          const tmp = d;
+          d = c; c = b;
+          b = step(f, a,b,c,d, X[g], S[sIdx], j);
+          a = tmp;
+        }
+        a = (a+aa)>>>0; b=(b+bb)>>>0; c=(c+cc)>>>0; d=(d+dd)>>>0;
+      }
+      const out = new Uint8Array(16);
+      const outDV = new DataView(out.buffer);
+      outDV.setUint32(0,a,true); outDV.setUint32(4,b,true); outDV.setUint32(8,c,true); outDV.setUint32(12,d,true);
+      return toHex(out);
+    }
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UUID Generator - DevTools Hub</title>
+  <meta name="description" content="Generate v1, v4, and v7 UUIDs. Bulk generation, copy and download. Works offline.">
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+  <meta name="color-scheme" content="light dark">
+  <style>
+    .grid-3 { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1rem; }
+  </style>
+  </head>
+<body data-theme="light">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <a href="../index.html" class="logo"><span class="logo-icon">🛠️</span><span>DevTools Hub</span></a>
+        </div>
+        <nav class="nav-links">
+          <a href="../index.html" class="nav-link">Home</a>
+          <a href="#" class="nav-link active">Utilities</a>
+        </nav>
+        <div class="header-actions">
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="tool-layout">
+        <div class="tool-content">
+          <div class="tool-header">
+            <div class="tool-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+            <div class="tool-info"><h1>UUID Generator</h1><p class="tool-description">Generate UUID v1, v4, and v7. Bulk output with copy/download.</p></div>
+          </div>
+
+          <div class="card mb-6">
+            <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><div><h3 class="card-title">Options</h3></div></div>
+            <div class="grid-3" style="padding:1rem;">
+              <div class="form-group"><label class="form-label">Version</label><select id="version" class="form-input"><option value="v4">UUID v4 (random)</option><option value="v1">UUID v1 (time-based)</option><option value="v7">UUID v7 (Unix epoch)</option></select></div>
+              <div class="form-group"><label class="form-label">Count</label><input id="count" type="number" min="1" max="10000" value="10" class="form-input"></div>
+              <div class="form-group"><label class="form-label">Uppercase</label><select id="upper" class="form-input"><option value="no">No</option><option value="yes">Yes</option></select></div>
+            </div>
+            <div class="btn-group"><button class="btn btn-primary" onclick="generate()">Generate</button><button class="btn" onclick="copyOut()">Copy</button><button class="btn" onclick="downloadOut()">Download</button><button class="btn btn-ghost" onclick="clearOut()">Clear</button></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg></div><div><h3 class="card-title">Output</h3></div></div>
+            <div class="form-group" style="padding:1rem"><textarea id="out" class="form-textarea" rows="14" placeholder="Generated UUIDs will appear here..."></textarea></div>
+          </div>
+        </div>
+        <div class="tool-sidebar">
+          <div class="card"><div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18"/><path d="M12 3v18"/></svg></div><div><h3 class="card-title">About</h3></div></div>
+            <div class="text-sm text-secondary" style="padding:1rem;">UUID v4 uses secure random. UUID v1/v7 are generated locally and are not guaranteed to be globally unique but follow the standard layout and variant bits.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section"><h4>DevTools Hub</h4><p>Professional developer tools that work offline.</p></div>
+        <div class="footer-section"><h4>Utilities</h4><a href="uuid-generator.html">UUID Generator</a></div>
+        <div class="footer-section"><h4>Popular</h4><a href="../tools/json-formatter.html">JSON</a><a href="../tools/qr-generator.html">QR</a></div>
+        <div class="footer-section"><h4>Features</h4><span>✓ Offline</span></div>
+      </div>
+      <div class="footer-bottom"><p>&copy; 2024 DevTools Hub.</p></div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    function clearOut(){ document.getElementById('out').value=''; }
+    function copyOut(){ const t=document.getElementById('out').value; if(!t){ note('Nothing to copy'); return;} if(window.ClipboardManager) window.ClipboardManager.copyText(t); else if(navigator.clipboard) navigator.clipboard.writeText(t); note('Copied'); }
+    function downloadOut(){ const blob=new Blob([document.getElementById('out').value],{type:'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='uuids.txt'; a.click(); URL.revokeObjectURL(a.href); }
+    function note(m){ if(window.ToastManager) window.ToastManager.show(m); else alert(m); }
+
+    function generate(){
+      const ver = document.getElementById('version').value;
+      const count = Math.max(1, Math.min(10000, parseInt(document.getElementById('count').value||'1',10)));
+      const upper = document.getElementById('upper').value === 'yes';
+      const list = [];
+      for(let i=0;i<count;i++){
+        let id;
+        if(ver==='v4') id = uuidv4();
+        else if(ver==='v1') id = uuidv1();
+        else id = uuidv7();
+        list.push(upper? id.toUpperCase() : id);
+      }
+      document.getElementById('out').value = list.join('\n');
+    }
+
+    function hex(bytes){ return Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+    function setVariant(bytes){ bytes[8] = (bytes[8] & 0x3f) | 0x80; }
+    function setVersion(bytes, v){ bytes[6] = (bytes[6] & 0x0f) | (v<<4); }
+    function formatUuid(bytes){ const h=hex(bytes); return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`; }
+
+    function uuidv4(){
+      const b = new Uint8Array(16);
+      crypto.getRandomValues(b);
+      setVersion(b, 4); setVariant(b);
+      return formatUuid(b);
+    }
+
+    // Simplified UUID v1 (no MAC; random node, monotonic clock sequence)
+    let __v1_lastMs = 0; let __v1_clock = 0;
+    function uuidv1(){
+      const b = new Uint8Array(16);
+      const now = Date.now();
+      if(now === __v1_lastMs) __v1_clock = (__v1_clock + 1) & 0x3fff; else { __v1_clock = 0; __v1_lastMs = now; }
+      const gregorianOffset = 12219292800000; // ms between 1582-10-15 and 1970-01-01
+      const t = BigInt((now + gregorianOffset) * 10000) + BigInt(__v1_clock);
+      const timeLow = Number(t & 0xffffffffn) >>> 0;
+      const timeMid = Number((t >> 32n) & 0xffffn) >>> 0;
+      const timeHi = Number((t >> 48n) & 0x0fffn) >>> 0;
+      b[0]= (timeLow>>>24)&0xff; b[1]=(timeLow>>>16)&0xff; b[2]=(timeLow>>>8)&0xff; b[3]=(timeLow)&0xff;
+      b[4]= (timeMid>>>8)&0xff; b[5]=(timeMid)&0xff;
+      b[6]= (timeHi)&0xff; b[7]= ((timeHi>>>8)&0x0f); // version later
+      const clk = __v1_clock;
+      b[8]= (clk>>>8)&0x3f; // variant later
+      b[9]= (clk)&0xff;
+      crypto.getRandomValues(b.subarray(10,16)); // node
+      setVersion(b, 1); setVariant(b);
+      return formatUuid(b);
+    }
+
+    function uuidv7(){
+      const b = new Uint8Array(16);
+      const ms = BigInt(Date.now());
+      // 48-bit unix ts ms
+      b[0] = Number((ms >> 40n) & 0xffn);
+      b[1] = Number((ms >> 32n) & 0xffn);
+      b[2] = Number((ms >> 24n) & 0xffn);
+      b[3] = Number((ms >> 16n) & 0xffn);
+      b[4] = Number((ms >> 8n) & 0xffn);
+      b[5] = Number(ms & 0xffn);
+      crypto.getRandomValues(b.subarray(6,16));
+      setVersion(b, 7); setVariant(b);
+      return formatUuid(b);
+    }
+  </script>
+</body>
+</html>
+

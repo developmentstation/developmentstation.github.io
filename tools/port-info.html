@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Port Info - DevTools Hub</title>
+  <meta name="description" content="Lookup common TCP/UDP ports and services. Filter and copy.">
+  <link rel="stylesheet" href="../assets/css/modern-styles.css">
+  <meta name="color-scheme" content="light dark">
+  <style>
+    table{width:100%; border-collapse:collapse}
+    th,td{padding:.5rem .75rem; border-bottom:1px solid var(--border-subtle); text-align:left}
+    th{color:var(--text-secondary); font-weight:600}
+    tr:hover{background:var(--surface-hover)}
+  </style>
+</head>
+<body data-theme="light">
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <button class="btn btn-ghost" onclick="goBack()" aria-label="Go back">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          </button>
+          <a href="../index.html" class="logo"><span class="logo-icon">🛠️</span><span>DevTools Hub</span></a>
+        </div>
+        <nav class="nav-links"><a href="../index.html" class="nav-link">Home</a><a href="#" class="nav-link active">Network</a></nav>
+        <div class="header-actions">
+          <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search tools..." class="search-input">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span id="themeIcon">🌙</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="tool-header"><div class="tool-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><div class="tool-info"><h1>Port Info</h1><p class="tool-description">Common TCP/UDP ports and services.</p></div></div>
+      <div class="card mb-6">
+        <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><div><h3 class="card-title">Search</h3></div></div>
+        <div class="grid" style="grid-template-columns: 2fr 1fr; gap:1rem; padding:1rem;">
+          <input id="filter" class="form-input" placeholder="Filter by port, service or proto">
+          <div class="btn-group"><button class="btn" onclick="copyTable()">Copy visible</button><button class="btn btn-ghost" onclick="clearFilter()">Clear</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></div><div><h3 class="card-title">Ports</h3></div></div>
+        <div style="overflow:auto">
+          <table id="table"><thead><tr><th>Port</th><th>Proto</th><th>Service</th><th>Description</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><div class="footer-content"><div class="footer-section"><h4>DevTools Hub</h4><p>Professional developer tools that work offline.</p></div><div class="footer-section"><h4>Network</h4><a href="ip-info.html">IP Info</a><a href="user-agent.html">User-Agent</a><a href="port-info.html">Port Info</a></div><div class="footer-section"><h4>Popular</h4><a href="../tools/json-formatter.html">JSON</a><a href="../tools/qr-generator.html">QR</a></div><div class="footer-section"><h4>Features</h4><span>✓ Offline</span></div></div><div class="footer-bottom"><p>© 2024 DevTools Hub.</p></div></div></footer>
+
+  <script src="../assets/js/modern-shared.js"></script>
+  <script>
+    const PORTS=[
+      {p:20,proto:'TCP',s:'FTP data',d:'File Transfer Protocol data'},
+      {p:21,proto:'TCP',s:'FTP control',d:'File Transfer Protocol control'},
+      {p:22,proto:'TCP',s:'SSH',d:'Secure Shell'},
+      {p:23,proto:'TCP',s:'Telnet',d:'Unencrypted remote login'},
+      {p:25,proto:'TCP',s:'SMTP',d:'Mail transfer'},
+      {p:53,proto:'UDP',s:'DNS',d:'Domain Name System'},
+      {p:53,proto:'TCP',s:'DNS',d:'Domain Name System'},
+      {p:67,proto:'UDP',s:'DHCP',d:'DHCP server'},
+      {p:68,proto:'UDP',s:'DHCP',d:'DHCP client'},
+      {p:69,proto:'UDP',s:'TFTP',d:'Trivial File Transfer'},
+      {p:80,proto:'TCP',s:'HTTP',d:'Hypertext Transfer Protocol'},
+      {p:110,proto:'TCP',s:'POP3',d:'Post Office Protocol'},
+      {p:123,proto:'UDP',s:'NTP',d:'Network Time Protocol'},
+      {p:135,proto:'TCP',s:'RPC',d:'Microsoft RPC'},
+      {p:137,proto:'UDP',s:'NetBIOS-NS',d:'NetBIOS Name Service'},
+      {p:139,proto:'TCP',s:'NetBIOS-SSN',d:'NetBIOS Session Service'},
+      {p:143,proto:'TCP',s:'IMAP',d:'Mail access'},
+      {p:161,proto:'UDP',s:'SNMP',d:'Simple Network Management Protocol'},
+      {p:389,proto:'TCP',s:'LDAP',d:'Directory services'},
+      {p:443,proto:'TCP',s:'HTTPS',d:'HTTP over TLS'},
+      {p:445,proto:'TCP',s:'SMB',d:'Microsoft-DS'},
+      {p:465,proto:'TCP',s:'SMTPS',d:'SMTP over TLS'},
+      {p:514,proto:'UDP',s:'Syslog',d:'System logging'},
+      {p:554,proto:'TCP',s:'RTSP',d:'Streaming'},
+      {p:587,proto:'TCP',s:'Submission',d:'Mail submission'},
+      {p:631,proto:'TCP',s:'IPP',d:'Printing'},
+      {p:636,proto:'TCP',s:'LDAPS',d:'LDAP over TLS'},
+      {p:993,proto:'TCP',s:'IMAPS',d:'IMAP over TLS'},
+      {p:995,proto:'TCP',s:'POP3S',d:'POP3 over TLS'},
+      {p:1433,proto:'TCP',s:'MSSQL',d:'Microsoft SQL Server'},
+      {p:1521,proto:'TCP',s:'Oracle',d:'Oracle DB'},
+      {p:2049,proto:'TCP',s:'NFS',d:'Network File System'},
+      {p:2083,proto:'TCP',s:'cPanel',d:'cPanel over TLS'},
+      {p:2087,proto:'TCP',s:'WHM',d:'WHM over TLS'},
+      {p:3306,proto:'TCP',s:'MySQL',d:'MySQL DB'},
+      {p:3389,proto:'TCP',s:'RDP',d:'Remote Desktop'},
+      {p:5432,proto:'TCP',s:'PostgreSQL',d:'Postgres DB'},
+      {p:5672,proto:'TCP',s:'AMQP',d:'RabbitMQ'},
+      {p:6379,proto:'TCP',s:'Redis',d:'Key-value store'},
+      {p:8080,proto:'TCP',s:'HTTP-alt',d:'HTTP alternative'},
+      {p:8443,proto:'TCP',s:'HTTPS-alt',d:'HTTPS alternative'},
+      {p:9200,proto:'TCP',s:'Elasticsearch',d:'Search engine'},
+      {p:11211,proto:'TCP',s:'Memcached',d:'Cache'},
+      {p:27017,proto:'TCP',s:'MongoDB',d:'NoSQL DB'}
+    ];
+    function render(){
+      const q=(document.getElementById('filter').value||'').toLowerCase();
+      const rows=PORTS.filter(x=> (''+x.p).includes(q)||x.proto.toLowerCase().includes(q)||x.s.toLowerCase().includes(q)||x.d.toLowerCase().includes(q));
+      const tb=document.querySelector('#table tbody'); tb.innerHTML=rows.map(r=>`<tr><td>${r.p}</td><td>${r.proto}</td><td>${r.s}</td><td>${r.d}</td></tr>`).join('');
+    }
+    function copyTable(){ const t=[...document.querySelectorAll('#table tr')].map(tr=>[...tr.children].map(td=>td.textContent).join('\t')).join('\n'); if(window.ClipboardManager) window.ClipboardManager.copyText(t); else if(navigator.clipboard) navigator.clipboard.writeText(t); }
+    function clearFilter(){ document.getElementById('filter').value=''; render(); }
+    document.getElementById('filter').addEventListener('input', render);
+    render();
+  </script>
+</body>
+</html>
+
