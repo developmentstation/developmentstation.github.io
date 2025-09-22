@@ -9,8 +9,6 @@ window.SPAComponents = {
   
   // Home Page Component
   async HomePage() {
-    console.log('HomePage called, this:', this);
-    console.log('window.SPAComponents:', window.SPAComponents);
     return `
       <!-- Hero Section -->
       <section class="hero-enhanced">
@@ -195,7 +193,109 @@ window.SPAComponents = {
 
     // Load tool-specific component if available
     const toolComponent = window.SPATools?.getToolComponent(params.id);
-    const toolContent = toolComponent ? await toolComponent() : window.SPAComponents.renderDefaultToolContent(toolData);
+    let toolContent;
+    
+    if (toolComponent) {
+      toolContent = await toolComponent();
+    } else {
+      // Try to load from original HTML file
+      try {
+        const response = await fetch(`tools/${params.id}.html`);
+        if (response.ok) {
+          const html = await response.text();
+          // Extract the main content from the HTML file
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const mainContent = doc.querySelector('main') || doc.querySelector('.container') || doc.body;
+          
+          if (mainContent) {
+            toolContent = mainContent.innerHTML;
+            // Prepare shims for functions referenced by inline onclick handlers
+            try {
+              const tmpContainer = document.createElement('div');
+              tmpContainer.innerHTML = toolContent;
+              const clickable = tmpContainer.querySelectorAll('[onclick]');
+              const functionNames = new Set();
+              clickable.forEach(el => {
+                const handler = el.getAttribute('onclick') || '';
+                const match = handler.match(/^[\s\n\r]*([a-zA-Z_$][\w$]*)\s*\(/);
+                if (match && match[1]) functionNames.add(match[1]);
+              });
+              // Define pass-through wrappers so HTML handlers resolve even before real functions load
+              setTimeout(() => {
+                functionNames.forEach(name => {
+                  if (!window[name]) {
+                    window[name] = (...args) => {
+                      const invoke = () => {
+                        if (typeof window[name] === 'function' && window[name] !== invoke) {
+                          return window[name](...args);
+                        }
+                        // Retry briefly while scripts attach real implementations
+                        setTimeout(invoke, 10);
+                      };
+                      invoke();
+                    };
+                  }
+                });
+              }, 0);
+            } catch (shimError) {
+              console.warn('Shim setup failed:', shimError);
+            }
+            
+            // Extract and execute JavaScript from the original file
+            const scripts = Array.from(doc.querySelectorAll('script'));
+            // Track already-loaded external scripts to avoid duplicate execution
+            window.__SPA_LOADED_SCRIPTS = window.__SPA_LOADED_SCRIPTS || new Set();
+            // Execute scripts in sequence to preserve order
+            const executeScriptsSequentially = async () => {
+              for (const script of scripts) {
+                if (script.src) {
+                  // Resolve relative paths against the tool file location
+                  const srcUrl = new URL(script.getAttribute('src'), window.location.origin + `/tools/${params.id}.html`).href;
+                  // Skip shared script that's already included globally
+                  if (srcUrl.endsWith('/assets/js/modern-shared.js') || window.__SPA_LOADED_SCRIPTS.has(srcUrl)) {
+                    continue;
+                  }
+                  await new Promise((resolve, reject) => {
+                    const s = document.createElement('script');
+                    s.src = srcUrl;
+                    s.onload = resolve;
+                    s.onerror = reject;
+                    document.head.appendChild(s);
+                  })
+                  .then(() => { window.__SPA_LOADED_SCRIPTS.add(srcUrl); })
+                  .catch(err => console.error(`Failed to load external script ${srcUrl} for ${params.id}:`, err));
+                } else if (script.textContent && script.textContent.trim()) {
+                  try {
+                    const s = document.createElement('script');
+                    s.type = 'text/javascript';
+                    // Ensure execution in global scope
+                    s.text = script.textContent;
+                    document.head.appendChild(s);
+                    // Leave the script node attached to avoid GC before handlers bind
+                  } catch (scriptError) {
+                    console.error(`Error executing inline script for ${params.id}:`, scriptError);
+                  }
+                }
+              }
+            };
+            // Run after DOM updates so elements exist for onload bindings
+            setTimeout(async () => {
+              await executeScriptsSequentially();
+              // Simulate DOMContentLoaded for tools that rely on it
+              try { document.dispatchEvent(new Event('DOMContentLoaded')); } catch {}
+            }, 0);
+          } else {
+            toolContent = window.SPAComponents.renderDefaultToolContent(toolData);
+          }
+        } else {
+          toolContent = window.SPAComponents.renderDefaultToolContent(toolData);
+        }
+      } catch (error) {
+        console.error('Failed to load tool HTML:', error);
+        toolContent = window.SPAComponents.renderDefaultToolContent(toolData);
+      }
+    }
 
     return `
       <div class="container">
