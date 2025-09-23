@@ -200,8 +200,13 @@ window.SPAComponents = {
     } else {
       // Try to load from original HTML file
       try {
-        const response = await fetch(`tools/${params.id}.html`);
-        if (response.ok) {
+        // Try absolute path first (works reliably on GitHub Pages)
+        let response = await fetch(`${location.origin}/tools/${params.id}.html`).catch(() => null);
+        if (!response || !response.ok) {
+          // Fallback to relative path
+          response = await fetch(`tools/${params.id}.html`).catch(() => null);
+        }
+        if (response && response.ok) {
           const html = await response.text();
           // Extract the main content from the HTML file
           const parser = new DOMParser();
@@ -290,6 +295,7 @@ window.SPAComponents = {
           }
         } else {
           toolContent = window.SPAComponents.renderDefaultToolContent(toolData);
+          try { if (window.ToastManager) window.ToastManager.warning(`Failed to load tool UI for ${toolData.name}`); } catch {}
         }
       } catch (error) {
         console.error('Failed to load tool HTML:', error);
