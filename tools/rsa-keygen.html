@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RSA Key Generator - DevTools Hub</title>
+    <title>RSA Key Generator - Development Station</title>
     <meta name="description" content="Generate RSA public and private key pairs with various key sizes. Export keys in PEM, PKCS#8, and other formats.">
     <meta name="keywords" content="rsa key generator, public key, private key, cryptography, pem format, pkcs8, key pair">
     <meta name="ga-measurement-id" content="">
@@ -16,7 +16,7 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <h1><a href="../index.html">DevTools Hub</a></h1>
+                    <h1><a href="../index.html">Development Station</a></h1>
                 </div>
                 <nav class="nav">
                     <a href="../index.html" class="nav-link">Home</a>
@@ -155,7 +155,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 DevTools Hub. All rights reserved.</p>
+            <p>&copy; 2024 Development Station. All rights reserved.</p>
         </div>
     </footer>
 
@@ -323,7 +323,7 @@
                 privateKey: document.getElementById('privateKey').textContent,
                 publicKey: document.getElementById('publicKey').textContent,
                 exportedAt: new Date().toISOString(),
-                tool: 'DevTools Hub - RSA Key Generator'
+                tool: 'Development Station - RSA Key Generator'
             };
 
             const blob = new Blob([JSON.stringify(exportData, null, 2)], {

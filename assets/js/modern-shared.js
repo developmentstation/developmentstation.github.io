@@ -1,5 +1,5 @@
 /**
- * Modern DevTools Hub - Enhanced Shared JavaScript
+ * Modern Development Station - Enhanced Shared JavaScript
  * Modular utility classes for modern web application
  */
 
@@ -871,9 +871,9 @@ class SEOManager {
 
   getTitle() {
     const h1 = document.querySelector('.tool-header h1, h1');
-    if (h1 && h1.textContent.trim()) return `${h1.textContent.trim()} - DevTools Hub`;
+    if (h1 && h1.textContent.trim()) return `${h1.textContent.trim()} - Development Station`;
     if (document.title) return document.title;
-    return 'DevTools Hub - Free Online Developer Tools';
+    return 'Development Station - Free Online Developer Tools';
   }
 
   getDescription() {
@@ -942,7 +942,7 @@ class SEOManager {
     const hasType = (type) => existing.some(o => o['@type'] === type || (Array.isArray(o['@type']) && o['@type'].includes(type)));
 
     const url = this.getCanonicalUrl();
-    const name = (document.querySelector('.tool-header h1, h1') || {}).textContent || 'DevTools Hub';
+    const name = (document.querySelector('.tool-header h1, h1') || {}).textContent || 'Development Station';
     const description = this.getDescription();
 
     // WebSite on home
@@ -950,7 +950,7 @@ class SEOManager {
       this.injectLD({
         '@context': 'https://schema.org',
         '@type': 'WebSite',
-        name: 'DevTools Hub',
+        name: 'Development Station',
         url: url,
         potentialAction: {
           '@type': 'SearchAction',

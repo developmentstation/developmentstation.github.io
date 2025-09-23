@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOTP Generator - DevTools Hub</title>
+    <title>TOTP Generator - Development Station</title>
     <meta name="description" content="Generate Time-based One-Time Passwords (TOTP) for two-factor authentication. Compatible with Google Authenticator, Authy, and other 2FA apps.">
     <meta name="keywords" content="totp generator, two factor authentication, 2fa, otp, google authenticator, authy, time based otp">
     <meta name="ga-measurement-id" content="">
@@ -16,7 +16,7 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <h1><a href="../index.html">DevTools Hub</a></h1>
+                    <h1><a href="../index.html">Development Station</a></h1>
                 </div>
                 <nav class="nav">
                     <a href="../index.html" class="nav-link">Home</a>
@@ -187,7 +187,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 DevTools Hub. All rights reserved.</p>
+            <p>&copy; 2024 Development Station. All rights reserved.</p>
         </div>
     </footer>
 
@@ -357,7 +357,7 @@
             const algorithm = document.getElementById('algorithm').value;
 
             // Create TOTP URI
-            const issuer = 'DevTools Hub';
+            const issuer = 'Development Station';
             const accountName = 'TOTP Generator';
             const totpUri = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${currentSecret}&issuer=${encodeURIComponent(issuer)}&algorithm=${algorithm}&digits=${digits}&period=${timeStep}`;
 

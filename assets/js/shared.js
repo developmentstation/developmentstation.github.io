@@ -1,4 +1,4 @@
-// Shared JavaScript functionality for DevTools Hub
+// Shared JavaScript functionality for Development Station
 
 // Theme Management
 class ThemeManager {
