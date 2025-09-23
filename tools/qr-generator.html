@@ -13,7 +13,7 @@
     <meta property="og:title" content="QR Code Generator - DevTools Hub">
     <meta property="og:description" content="Generate QR codes for URLs, text, WiFi, and more">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://devtools-hub.com/tools/qr-generator.html">
+    <meta property="og:url" content="https://developmentstation.github.io/tools/qr-generator.html">
     <meta property="og:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
     
     <!-- Twitter Card -->
@@ -242,7 +242,7 @@
         "@type": "WebApplication",
         "name": "QR Code Generator",
         "description": "Generate QR codes for URLs, text, WiFi, and more",
-        "url": "https://devtools-hub.com/tools/qr-generator.html",
+        "url": "https://developmentstation.github.io/tools/qr-generator.html",
         "applicationCategory": "DeveloperApplication",
         "operatingSystem": "Any",
         "offers": {
@@ -1119,7 +1119,7 @@
             switch (type) {
                 case 'website':
                     switchQRType('url');
-                    document.getElementById('urlContent').value = 'https://devtools-hub.com';
+                    document.getElementById('urlContent').value = 'https://developmentstation.github.io';
                     break;
                 case 'wifi':
                     switchQRType('wifi');
@@ -1136,7 +1136,7 @@
                     break;
                 case 'email':
                     switchQRType('email');
-                    document.getElementById('emailTo').value = 'hello@devtools-hub.com';
+                    document.getElementById('emailTo').value = 'hello@developmentstation.github.io';
                     document.getElementById('emailSubject').value = 'Hello from QR Code';
                     document.getElementById('emailBody').value = 'This email was generated from a QR code!';
                     break;
