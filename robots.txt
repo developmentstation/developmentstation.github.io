@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://devtools-hub.com/sitemap.xml
+Sitemap: https://developmentstation.github.io/sitemap.xml
 
