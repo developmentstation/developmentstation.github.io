@@ -8,12 +8,12 @@ Allow: /
 Disallow: /assets/js/libs/
 Disallow: *.min.js$
 Disallow: *.min.css$
-Crawl-delay: 1
+# Crawl-delay: 1
 
 # Google
 User-agent: Googlebot
 Allow: /
-Crawl-delay: 0
+# Crawl-delay: 0
 
 # Google Images
 User-agent: Googlebot-Image
@@ -23,32 +23,32 @@ Disallow: /assets/js/
 # Bing
 User-agent: Bingbot
 Allow: /
-Crawl-delay: 1
+# Crawl-delay: 1
 
 # DuckDuckGo
 User-agent: DuckDuckBot
 Allow: /
-Crawl-delay: 1
+# Crawl-delay: 1
 
 # OpenAI GPT Bot
 User-agent: GPTBot
 Allow: /
-Crawl-delay: 2
+# Crawl-delay: 2
 
 # ChatGPT User
 User-agent: ChatGPT-User
 Allow: /
-Crawl-delay: 2
+# Crawl-delay: 2
 
 # Anthropic AI
 User-agent: anthropic-ai
 Allow: /
-Crawl-delay: 2
+# Crawl-delay: 2
 
 # Perplexity Bot
 User-agent: PerplexityBot
 Allow: /
-Crawl-delay: 2
+# Crawl-delay: 2
 
 # Block bad bots
 User-agent: AhrefsBot

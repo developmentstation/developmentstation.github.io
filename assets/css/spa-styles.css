@@ -605,7 +605,7 @@
   .filter-btn-enhanced {
     transition: none;
   }
-  
+}
   /* Loading animations removed for performance
   .loading-logo .logo-icon,
   .loading-spinner {
