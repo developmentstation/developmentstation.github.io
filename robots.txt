@@ -1,4 +1,68 @@
+# Development Station - Robots.txt
+# Last Updated: 2025-09-24
+# https://developmentstation.github.io
+
+# Default - Allow all legitimate crawlers
 User-agent: *
 Allow: /
-Sitemap: https://developmentstation.github.io/sitemap.xml
+Disallow: /assets/js/libs/
+Disallow: *.min.js$
+Disallow: *.min.css$
+Crawl-delay: 1
 
+# Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Google Images
+User-agent: Googlebot-Image
+Allow: /
+Disallow: /assets/js/
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 1
+
+# OpenAI GPT Bot
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 2
+
+# ChatGPT User
+User-agent: ChatGPT-User
+Allow: /
+Crawl-delay: 2
+
+# Anthropic AI
+User-agent: anthropic-ai
+Allow: /
+Crawl-delay: 2
+
+# Perplexity Bot
+User-agent: PerplexityBot
+Allow: /
+Crawl-delay: 2
+
+# Block bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# Sitemaps
+Sitemap: https://developmentstation.github.io/sitemap.xml
+Sitemap: https://developmentstation.github.io/sitemap-tools.xml
