@@ -1141,3 +1141,215 @@ function goBack() {
 function goHome() {
   NavigationManager_instance.goHome();
 }
+
+// Enhanced UI Utilities
+class UIEnhancer {
+  constructor() {
+    this.init();
+  }
+
+  init() {
+    this.setupEnhancedAnimations();
+    this.setupEnhancedInteractions();
+    this.setupEnhancedLoadingStates();
+  }
+
+  setupEnhancedAnimations() {
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, observerOptions);
+
+    // Observe elements that should animate in
+    const animateElements = document.querySelectorAll('.tool-card-enhanced, .category-card-enhanced, .feature-card');
+    animateElements.forEach(el => {
+      el.classList.add('animate-on-scroll');
+      observer.observe(el);
+    });
+  }
+
+  setupEnhancedInteractions() {
+    // Enhanced hover effects
+    document.addEventListener('mouseover', (e) => {
+      const card = e.target.closest('.tool-card-enhanced, .category-card-enhanced');
+      if (card) {
+        this.addHoverEffect(card);
+      }
+    });
+
+    // Enhanced click feedback
+    document.addEventListener('click', (e) => {
+      const clickable = e.target.closest('.btn, .tool-card-enhanced, .category-card-enhanced');
+      if (clickable) {
+        this.addClickFeedback(clickable);
+      }
+    });
+  }
+
+  setupEnhancedLoadingStates() {
+    // Replace basic loading spinners with enhanced ones
+    const basicSpinners = document.querySelectorAll('.loading-spinner');
+    basicSpinners.forEach(spinner => {
+      if (!spinner.classList.contains('loading-spinner-enhanced')) {
+        spinner.className = 'loading-spinner-enhanced';
+      }
+    });
+  }
+
+  addHoverEffect(element) {
+    element.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+  }
+
+  addClickFeedback(element) {
+    element.style.transform = 'scale(0.98)';
+    element.style.transition = 'transform 0.1s ease';
+    
+    setTimeout(() => {
+      element.style.transform = '';
+      element.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    }, 100);
+  }
+
+  // Create enhanced status message
+  createStatusMessage(type, message, icon = null) {
+    const icons = {
+      success: '✓',
+      error: '✗',
+      warning: '⚠',
+      info: 'ℹ'
+    };
+
+    const displayIcon = icon || icons[type] || 'ℹ';
+
+    return `
+      <div class="status-message ${type} fade-in">
+        <span class="status-icon">${displayIcon}</span>
+        <span class="status-text">${message}</span>
+      </div>
+    `;
+  }
+}
+
+// Progress indicator for long-running operations
+class ProgressManager {
+  constructor() {
+    this.activeOperations = new Map();
+  }
+
+  start(operationId, options = {}) {
+    const {
+      message = 'Processing...',
+      showPercentage = false,
+      cancellable = false
+    } = options;
+
+    const progressBar = this.createProgressBar(operationId, message, showPercentage, cancellable);
+    document.body.appendChild(progressBar);
+    
+    this.activeOperations.set(operationId, {
+      element: progressBar,
+      startTime: Date.now(),
+      ...options
+    });
+
+    return {
+      update: (progress, message) => this.update(operationId, progress, message),
+      finish: (message) => this.finish(operationId, message),
+      cancel: () => this.cancel(operationId)
+    };
+  }
+
+  createProgressBar(operationId, message, showPercentage, cancellable) {
+    const progressContainer = document.createElement('div');
+    progressContainer.className = 'progress-overlay fade-in';
+    progressContainer.innerHTML = `
+      <div class="progress-modal">
+        <div class="progress-content">
+          <div class="progress-message">${message}</div>
+          <div class="progress-bar-container">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 0%"></div>
+            </div>
+            ${showPercentage ? '<div class="progress-percentage">0%</div>' : ''}
+          </div>
+          ${cancellable ? `<button class="btn btn-outline btn-sm" onclick="window.ProgressManager.cancel('${operationId}')">Cancel</button>` : ''}
+        </div>
+      </div>
+    `;
+    return progressContainer;
+  }
+
+  update(operationId, progress, message) {
+    const operation = this.activeOperations.get(operationId);
+    if (!operation) return;
+
+    const progressFill = operation.element.querySelector('.progress-fill');
+    const progressPercentage = operation.element.querySelector('.progress-percentage');
+    const progressMessage = operation.element.querySelector('.progress-message');
+
+    if (progressFill) {
+      progressFill.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+    }
+
+    if (progressPercentage) {
+      progressPercentage.textContent = `${Math.round(progress)}%`;
+    }
+
+    if (message && progressMessage) {
+      progressMessage.textContent = message;
+    }
+  }
+
+  finish(operationId, message) {
+    const operation = this.activeOperations.get(operationId);
+    if (!operation) return;
+
+    this.update(operationId, 100, message || 'Complete!');
+    
+    setTimeout(() => {
+      operation.element.classList.add('fade-out');
+      setTimeout(() => {
+        if (operation.element.parentNode) {
+          operation.element.parentNode.removeChild(operation.element);
+        }
+        this.activeOperations.delete(operationId);
+      }, 300);
+    }, 1000);
+  }
+
+  cancel(operationId) {
+    const operation = this.activeOperations.get(operationId);
+    if (!operation) return;
+
+    operation.element.classList.add('fade-out');
+    setTimeout(() => {
+      if (operation.element.parentNode) {
+        operation.element.parentNode.removeChild(operation.element);
+      }
+      this.activeOperations.delete(operationId);
+    }, 300);
+
+    // Trigger cancel callback if provided
+    if (operation.onCancel) {
+      operation.onCancel();
+    }
+  }
+}
+
+// Initialize enhanced UI components
+try {
+  window.UIEnhancer = new UIEnhancer();
+  window.ProgressManager = new ProgressManager();
+  console.log('Enhanced UI components initialized');
+} catch (error) {
+  console.warn('Failed to initialize enhanced UI components:', error);
+}

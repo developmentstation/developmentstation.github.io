@@ -69,7 +69,7 @@ window.SPAComponents = {
           </div>
           
           <div class="grid grid-3" id="categoriesGrid">
-            ${window.SPAComponents.renderCategories()}
+            ${window.SPAComponents && typeof window.SPAComponents.renderCategories === 'function' ? window.SPAComponents.renderCategories() : '<p>Loading categories...</p>'}
           </div>
         </div>
       </section>
@@ -151,7 +151,7 @@ window.SPAComponents = {
         </div>
         
         <div class="grid grid-3" id="categoriesGrid">
-          ${window.SPAComponents.renderCategories()}
+          ${window.SPAComponents && typeof window.SPAComponents.renderCategories === 'function' ? window.SPAComponents.renderCategories() : '<p>Loading categories...</p>'}
         </div>
       </div>
     `;
@@ -200,11 +200,12 @@ window.SPAComponents = {
     } else {
       // Try to load from original HTML file
       try {
-        // Try absolute path first (works reliably on GitHub Pages)
-        let response = await fetch(`${location.origin}/tools/${params.id}.html`).catch(() => null);
+        // Use absolute path that works reliably on GitHub Pages
+        const toolUrl = `${window.location.origin}${window.location.pathname.replace(/\/$/, '')}/tools/${params.id}.html`;
+        let response = await fetch(toolUrl).catch(() => null);
         if (!response || !response.ok) {
-          // Fallback to relative path
-          response = await fetch(`tools/${params.id}.html`).catch(() => null);
+          // Fallback to relative path from root
+          response = await fetch(`./tools/${params.id}.html`).catch(() => null);
         }
         if (response && response.ok) {
           const html = await response.text();
@@ -251,45 +252,104 @@ window.SPAComponents = {
             const scripts = Array.from(doc.querySelectorAll('script'));
             // Track already-loaded external scripts to avoid duplicate execution
             window.__SPA_LOADED_SCRIPTS = window.__SPA_LOADED_SCRIPTS || new Set();
+            window.__SPA_TOOL_CLEANUPS = window.__SPA_TOOL_CLEANUPS || new Map();
+            
+            // Clean up previous tool scripts if any
+            if (window.__SPA_TOOL_CLEANUPS.has(params.id)) {
+              const cleanup = window.__SPA_TOOL_CLEANUPS.get(params.id);
+              cleanup();
+            }
+            
+            const loadedScripts = [];
+            
             // Execute scripts in sequence to preserve order
             const executeScriptsSequentially = async () => {
-              for (const script of scripts) {
-                if (script.src) {
-                  // Resolve relative paths against the tool file location
-                  const srcUrl = new URL(script.getAttribute('src'), window.location.origin + `/tools/${params.id}.html`).href;
-                  // Skip shared script that's already included globally
-                  if (srcUrl.endsWith('/assets/js/modern-shared.js') || window.__SPA_LOADED_SCRIPTS.has(srcUrl)) {
-                    continue;
-                  }
-                  await new Promise((resolve, reject) => {
-                    const s = document.createElement('script');
-                    s.src = srcUrl;
-                    s.onload = resolve;
-                    s.onerror = reject;
-                    document.head.appendChild(s);
-                  })
-                  .then(() => { window.__SPA_LOADED_SCRIPTS.add(srcUrl); })
-                  .catch(err => console.error(`Failed to load external script ${srcUrl} for ${params.id}:`, err));
-                } else if (script.textContent && script.textContent.trim()) {
-                  try {
-                    const s = document.createElement('script');
-                    s.type = 'text/javascript';
-                    // Ensure execution in global scope
-                    s.text = script.textContent;
-                    document.head.appendChild(s);
-                    // Leave the script node attached to avoid GC before handlers bind
-                  } catch (scriptError) {
-                    console.error(`Error executing inline script for ${params.id}:`, scriptError);
+              try {
+                for (const script of scripts) {
+                  if (script.src) {
+                    // Resolve relative paths against the tool file location
+                    const srcUrl = new URL(script.getAttribute('src'), toolUrl).href;
+                    // Skip shared script that's already included globally
+                    if (srcUrl.endsWith('/assets/js/modern-shared.js') || window.__SPA_LOADED_SCRIPTS.has(srcUrl)) {
+                      continue;
+                    }
+                    
+                    await new Promise((resolve, reject) => {
+                      const s = document.createElement('script');
+                      s.src = srcUrl;
+                      s.onload = () => {
+                        console.log(`Loaded script: ${srcUrl}`);
+                        resolve();
+                      };
+                      s.onerror = (error) => {
+                        console.error(`Failed to load script ${srcUrl}:`, error);
+                        reject(error);
+                      };
+                      document.head.appendChild(s);
+                      loadedScripts.push(s);
+                    })
+                    .then(() => { 
+                      window.__SPA_LOADED_SCRIPTS.add(srcUrl); 
+                    })
+                    .catch(err => {
+                      console.error(`Failed to load external script ${srcUrl} for ${params.id}:`, err);
+                      // Continue loading other scripts even if one fails
+                    });
+                  } else if (script.textContent && script.textContent.trim()) {
+                    try {
+                      // Create a temporary script element and execute it immediately
+                      // This avoids conflicts with the shim system while ensuring proper execution
+                      const tempScript = document.createElement('script');
+                      tempScript.type = 'text/javascript';
+                      tempScript.setAttribute('data-tool', params.id);
+                      tempScript.setAttribute('data-temp', 'true');
+                      
+                      // Set the script content
+                      tempScript.textContent = script.textContent;
+                      
+                      // Execute immediately by appending to head
+                      document.head.appendChild(tempScript);
+                      
+                      // Remove immediately after execution to avoid conflicts
+                      setTimeout(() => {
+                        if (tempScript.parentNode) {
+                          tempScript.parentNode.removeChild(tempScript);
+                        }
+                      }, 0);
+                      
+                      console.log(`Executed inline script for ${params.id}`);
+                    } catch (scriptError) {
+                      console.error(`Error executing inline script for ${params.id}:`, scriptError);
+                    }
                   }
                 }
+                
+                // Store cleanup function
+                window.__SPA_TOOL_CLEANUPS.set(params.id, () => {
+                  loadedScripts.forEach(script => {
+                    if (script.parentNode) {
+                      script.parentNode.removeChild(script);
+                    }
+                  });
+                });
+                
+              } catch (error) {
+                console.error(`Error in script execution for ${params.id}:`, error);
               }
             };
+            
             // Run after DOM updates so elements exist for onload bindings
             setTimeout(async () => {
               await executeScriptsSequentially();
               // Simulate DOMContentLoaded for tools that rely on it
-              try { document.dispatchEvent(new Event('DOMContentLoaded')); } catch {}
-            }, 0);
+              try { 
+                const event = new Event('DOMContentLoaded', { bubbles: true });
+                document.dispatchEvent(event);
+                console.log(`DOMContentLoaded dispatched for ${params.id}`);
+              } catch (error) {
+                console.warn(`Failed to dispatch DOMContentLoaded for ${params.id}:`, error);
+              }
+            }, 100); // Increased delay to ensure DOM is ready
           } else {
             toolContent = window.SPAComponents.renderDefaultToolContent(toolData);
           }
@@ -304,32 +364,38 @@ window.SPAComponents = {
     }
 
     return `
-      <div class="container">
-        <div class="tool-page-layout">
-          <!-- Main Tool Content -->
-          <div class="tool-content-enhanced">
-            <!-- Tool Header -->
-            <div class="tool-header-enhanced">
-              <div class="tool-icon-enhanced">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="modern-tool-page">
+        <!-- Tool Header Section -->
+        <section class="tool-hero-section">
+          <div class="container">
+            <div class="tool-hero-content">
+              <div class="tool-hero-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="3"/>
                   <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
                 </svg>
               </div>
-              <div class="tool-info-enhanced">
-                <h1>${toolData.name}</h1>
-                <p class="tool-description-enhanced">${toolData.description}</p>
+              <div class="tool-hero-info">
+                <h1 class="tool-hero-title">${toolData.name}</h1>
+                <p class="tool-hero-description">${toolData.description}</p>
               </div>
             </div>
+          </div>
+        </section>
 
+        <!-- Main Tool Content Section -->
+        <section class="tool-main-section">
+          <div class="tool-workspace">
             ${toolContent}
           </div>
+        </section>
 
-          <!-- Sidebar -->
-          <div class="tool-sidebar">
+        <!-- Tool Information Section -->
+        <section class="tool-info-section">
+          <div class="container">
             ${window.SPAComponents.renderToolSidebar(toolData)}
           </div>
-        </div>
+        </section>
       </div>
     `;
   },
@@ -510,7 +576,7 @@ window.SPAComponents = {
             <p class="card-description">${tool.description}</p>
           </div>
         </div>
-        ${tool.popular ? '<div class="popular-badge">Popular</div>' : ''}
+        ${tool.popular ? '<div class="popular-badge" title="Popular Tool"></div>' : ''}
       </a>
     `;
   },
@@ -572,57 +638,76 @@ window.SPAComponents = {
     const relatedTools = window.SPATools?.getRelatedTools(toolData.id) || [];
     
     return `
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="6" x2="12" y2="12"/>
-              <line x1="16" y1="10" x2="12" y2="12"/>
-            </svg>
-          </div>
-          <div>
-            <h3 class="card-title">About This Tool</h3>
-          </div>
-        </div>
-        <div class="space-y-3">
-          <p class="text-sm text-secondary">${toolData.description}</p>
-          <div class="flex justify-between text-sm">
-            <span class="text-secondary">Category:</span>
-            <a href="#/category/${toolData.category}" class="text-primary">${window.SPATools?.getCategoryById(toolData.category)?.name || toolData.category}</a>
-          </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-secondary">Privacy:</span>
-            <span class="text-success">Local Processing</span>
-          </div>
-        </div>
-      </div>
+      <div class="tool-info-grid">
 
-      ${relatedTools.length > 0 ? `
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="3"/>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-            </svg>
+        ${relatedTools.length > 0 ? `
+        <!-- Related Tools Section -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="card-title">Related Tools</h3>
+            </div>
           </div>
-          <div>
-            <h3 class="card-title">Related Tools</h3>
+          <div class="space-y-2">
+            ${relatedTools.map(tool => `
+              <a href="#/tool/${tool.id}" class="block p-3 rounded-lg hover:bg-secondary transition-colors">
+                <div class="font-medium text-sm">${tool.name}</div>
+                <div class="text-xs text-secondary">${tool.description}</div>
+              </a>
+            `).join('')}
           </div>
         </div>
-        <div class="space-y-2">
-          ${relatedTools.map(tool => `
-            <a href="#/tool/${tool.id}" class="block p-3 rounded-lg hover:bg-secondary transition-colors">
-              <div class="font-medium text-sm">${tool.name}</div>
-              <div class="text-xs text-secondary">${tool.description}</div>
-            </a>
-          `).join('')}
+        ` : ''}
+
+        <!-- Notes Section -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10,9 9,9 8,9"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="card-title">Notes</h3>
+            </div>
+          </div>
+          <div class="space-y-3">
+            <p class="text-sm text-secondary">All processing happens locally in your browser for maximum privacy.</p>
+            <p class="text-sm text-secondary">No data is sent to external servers or stored remotely.</p>
+            <p class="text-sm text-secondary">This tool works offline once loaded.</p>
+          </div>
         </div>
       </div>
-      ` : ''}
     `;
   }
 };
 
-console.log('SPAComponents loaded successfully');
+// Ensure all methods are properly bound
+if (window.SPAComponents) {
+  // Verify critical methods exist
+  const requiredMethods = [
+    'HomePage', 'ToolsPage', 'CategoriesPage', 'CategoryPage', 'ToolPage', 'AboutPage', 'NotFoundPage',
+    'renderPopularTools', 'renderAllTools', 'renderCategories', 'renderToolCard', 'renderCategoryCard',
+    'renderFilterButtons', 'renderDefaultToolContent', 'renderToolSidebar'
+  ];
+  
+  const missingMethods = requiredMethods.filter(method => typeof window.SPAComponents[method] !== 'function');
+  
+  if (missingMethods.length > 0) {
+    console.error('SPAComponents missing methods:', missingMethods);
+  } else {
+    console.log('SPAComponents loaded successfully with all required methods');
+  }
+} else {
+  console.error('SPAComponents failed to initialize');
+}

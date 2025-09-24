@@ -33,6 +33,11 @@
     <meta name="theme-color" content="#3b82f6">
     <meta name="color-scheme" content="light dark">
     
+    <!-- Disable caching for development -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     
@@ -256,11 +261,11 @@
         console.log('Starting to load Development Station SPA...');
         window.SPADebug = true;
     </script>
-        <script src="assets/js/modern-shared.js?v=1.0.2" onerror="console.error('Failed to load modern-shared.js')"></script>
-        <script src="assets/js/spa-router.js?v=1.0.2" onerror="console.error('Failed to load spa-router.js')"></script>
-        <script src="assets/js/spa-components-new.js?v=1.0.7" onerror="console.error('Failed to load spa-components-new.js')"></script>
-        <script src="assets/js/spa-tools.js?v=1.0.2" onerror="console.error('Failed to load spa-tools.js')"></script>
-        <script src="assets/js/spa-app.js?v=1.0.2" onerror="console.error('Failed to load spa-app.js')"></script>
+        <script src="assets/js/modern-shared.js" onerror="console.error('Failed to load modern-shared.js')"></script>
+        <script src="assets/js/spa-router.js" onerror="console.error('Failed to load spa-router.js')"></script>
+        <script src="assets/js/spa-components-new.js" onerror="console.error('Failed to load spa-components-new.js')"></script>
+        <script src="assets/js/spa-tools.js" onerror="console.error('Failed to load spa-tools.js')"></script>
+        <script src="assets/js/spa-app.js" onerror="console.error('Failed to load spa-app.js')"></script>
     <script>
         // Final initialization check
         setTimeout(() => {

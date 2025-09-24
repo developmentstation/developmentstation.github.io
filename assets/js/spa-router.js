@@ -166,6 +166,18 @@ class SPARouter {
     // Load component
     await this.loadComponent();
 
+    // Dispatch navigation event
+    window.dispatchEvent(new CustomEvent('spa-navigation', {
+      detail: { path, route: this.currentRoute }
+    }));
+
+    // Dispatch tool loaded event if it's a tool page
+    if (this.currentRoute && this.currentRoute.type === 'tool') {
+      window.dispatchEvent(new CustomEvent('spa-tool-loaded', {
+        detail: { toolId: this.currentRoute.id, path }
+      }));
+    }
+
     // Update body classes
     this.updateBodyClasses();
 
@@ -416,11 +428,18 @@ class SPARouter {
     `;
 
     try {
-      // Load component
+      // Load component with retry mechanism
       const componentName = this.currentRoute.component;
-      const component = window.SPAComponents?.[componentName];
+      let component = window.SPAComponents?.[componentName];
       
-      if (component) {
+      // If component not found, wait a bit and try again (handles race conditions)
+      if (!component && window.SPAComponents) {
+        console.log(`Component ${componentName} not immediately available, retrying...`);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        component = window.SPAComponents[componentName];
+      }
+      
+      if (component && typeof component === 'function') {
         const html = await component(this.currentRoute.params);
         
         // Add page transition
@@ -434,7 +453,7 @@ class SPARouter {
           }
         });
       } else {
-        throw new Error(`Component ${componentName} not found`);
+        throw new Error(`Component ${componentName} not found or not a function. Available components: ${window.SPAComponents ? Object.keys(window.SPAComponents).join(', ') : 'None'}`);
       }
     } catch (error) {
       console.error('Failed to load component:', error);

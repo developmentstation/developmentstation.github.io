@@ -398,17 +398,32 @@
             const now = new Date();
             const timestamp = Math.floor(now.getTime() / 1000);
             
-            document.getElementById('currentTimestamp').textContent = timestamp;
-            document.getElementById('currentDateTime').textContent = now.toISOString();
+            const currentTimestampEl = document.getElementById('currentTimestamp');
+            const currentDateTimeEl = document.getElementById('currentDateTime');
+            
+            if (currentTimestampEl) {
+                currentTimestampEl.textContent = timestamp;
+            }
+            if (currentDateTimeEl) {
+                currentDateTimeEl.textContent = now.toISOString();
+            }
         }
 
         // Convert from Unix timestamp to date
         function convertFromTimestamp() {
-            const input = document.getElementById('timestampInput').value.trim();
-            const timezone = document.getElementById('timestampTimezone').value;
-            const format = document.getElementById('dateFormat').value;
+            const inputEl = document.getElementById('timestampInput');
+            const timezoneEl = document.getElementById('timestampTimezone');
+            const formatEl = document.getElementById('dateFormat');
             const resultDiv = document.getElementById('timestampResult');
             const output = document.getElementById('timestampOutput');
+
+            if (!inputEl || !timezoneEl || !formatEl || !resultDiv || !output) {
+                return;
+            }
+
+            const input = inputEl.value.trim();
+            const timezone = timezoneEl.value;
+            const format = formatEl.value;
 
             if (!input) {
                 resultDiv.classList.add('hidden');
@@ -465,11 +480,19 @@
 
         // Convert from date to Unix timestamp
         function convertToTimestamp() {
-            const dateInput = document.getElementById('dateInput').value;
-            const timeInput = document.getElementById('timeInput').value;
-            const timezone = document.getElementById('dateTimezone').value;
+            const dateInputEl = document.getElementById('dateInput');
+            const timeInputEl = document.getElementById('timeInput');
+            const timezoneEl = document.getElementById('dateTimezone');
             const resultDiv = document.getElementById('dateResult');
             const output = document.getElementById('dateOutput');
+
+            if (!dateInputEl || !timeInputEl || !timezoneEl || !resultDiv || !output) {
+                return;
+            }
+
+            const dateInput = dateInputEl.value;
+            const timeInput = timeInputEl.value;
+            const timezone = timezoneEl.value;
 
             if (!dateInput) {
                 resultDiv.classList.add('hidden');
@@ -514,41 +537,86 @@
 
         // Utility functions
         function useCurrentTimestamp() {
-            const timestamp = Math.floor(Date.now() / 1000);
-            document.getElementById('timestampInput').value = timestamp;
-            convertFromTimestamp();
+            const timestampInputEl = document.getElementById('timestampInput');
+            if (timestampInputEl) {
+                const timestamp = Math.floor(Date.now() / 1000);
+                timestampInputEl.value = timestamp;
+                convertFromTimestamp();
+            }
         }
 
         function setCurrentDate() {
-            const now = new Date();
-            document.getElementById('dateInput').value = now.toISOString().split('T')[0];
-            document.getElementById('timeInput').value = now.toTimeString().slice(0, 5);
-            convertToTimestamp();
+            const dateInputEl = document.getElementById('dateInput');
+            const timeInputEl = document.getElementById('timeInput');
+            if (dateInputEl && timeInputEl) {
+                const now = new Date();
+                dateInputEl.value = now.toISOString().split('T')[0];
+                timeInputEl.value = now.toTimeString().slice(0, 5);
+                convertToTimestamp();
+            }
         }
 
         function clearTimestampInput() {
-            document.getElementById('timestampInput').value = '';
-            document.getElementById('timestampResult').classList.add('hidden');
+            const timestampInputEl = document.getElementById('timestampInput');
+            const timestampResultEl = document.getElementById('timestampResult');
+            if (timestampInputEl) {
+                timestampInputEl.value = '';
+            }
+            if (timestampResultEl) {
+                timestampResultEl.classList.add('hidden');
+            }
         }
 
         function clearDateInputs() {
-            document.getElementById('dateInput').value = '';
-            document.getElementById('timeInput').value = '';
-            document.getElementById('dateResult').classList.add('hidden');
+            const dateInputEl = document.getElementById('dateInput');
+            const timeInputEl = document.getElementById('timeInput');
+            const dateResultEl = document.getElementById('dateResult');
+            if (dateInputEl) {
+                dateInputEl.value = '';
+            }
+            if (timeInputEl) {
+                timeInputEl.value = '';
+            }
+            if (dateResultEl) {
+                dateResultEl.classList.add('hidden');
+            }
         }
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        function initializeTool() {
+            // Clear any existing interval
+            if (currentTimeInterval) {
+                clearInterval(currentTimeInterval);
+            }
+            
             updateCurrentTime();
             currentTimeInterval = setInterval(updateCurrentTime, 1000);
             
             // Set default date to today
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('dateInput').value = today;
-        });
+            const dateInputEl = document.getElementById('dateInput');
+            if (dateInputEl) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInputEl.value = today;
+            }
+        }
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', initializeTool);
+
+        // Initialize when SPA loads this tool
+        if (window.SPARouter) {
+            window.addEventListener('spa-tool-loaded', initializeTool);
+        }
 
         // Cleanup interval when leaving page
         window.addEventListener('beforeunload', () => {
+            if (currentTimeInterval) {
+                clearInterval(currentTimeInterval);
+            }
+        });
+
+        // Cleanup interval when SPA navigates away
+        window.addEventListener('spa-navigation', () => {
             if (currentTimeInterval) {
                 clearInterval(currentTimeInterval);
             }

@@ -62,21 +62,45 @@ class SPAApp {
 
   async waitForDependencies() {
     // Wait for essential dependencies to be available
-    const maxWait = 5000; // 5 seconds
+    const maxWait = 10000; // 10 seconds
     const startTime = Date.now();
+    const checkInterval = 50; // Check every 50ms
     
-    while (!window.SPARouter || !window.SPAComponents || !window.SPATools) {
-      if (Date.now() - startTime > maxWait) {
-        console.error('Missing dependencies:', {
-          SPARouter: !!window.SPARouter,
-          SPAComponents: !!window.SPAComponents,
-          SPATools: !!window.SPATools
-        });
-        throw new Error('Dependencies failed to load within timeout');
+    const dependencies = ['SPARouter', 'SPAComponents', 'SPATools'];
+    
+    while (Date.now() - startTime < maxWait) {
+      const missingDeps = dependencies.filter(dep => !window[dep]);
+      
+      if (missingDeps.length === 0) {
+        console.log('All dependencies loaded successfully');
+        return;
       }
-      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Log progress every second
+      if ((Date.now() - startTime) % 1000 < checkInterval) {
+        console.log('Waiting for dependencies:', missingDeps);
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, checkInterval));
     }
-    console.log('All dependencies loaded successfully');
+    
+    // Final check with detailed error reporting
+    const missingDeps = dependencies.filter(dep => !window[dep]);
+    if (missingDeps.length > 0) {
+      console.error('Missing dependencies after timeout:', {
+        missing: missingDeps,
+        available: dependencies.filter(dep => window[dep]),
+        timeout: maxWait + 'ms'
+      });
+      
+      // Try to continue with partial dependencies
+      if (window.SPARouter && window.SPAComponents) {
+        console.warn('Continuing with partial dependencies');
+        return;
+      }
+      
+      throw new Error(`Critical dependencies failed to load: ${missingDeps.join(', ')}`);
+    }
   }
 
   showLoadingScreen() {

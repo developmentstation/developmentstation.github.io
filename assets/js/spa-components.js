@@ -404,7 +404,7 @@ window.SPAComponents = {
             <p class="card-description">${tool.description}</p>
           </div>
         </div>
-        ${tool.popular ? '<div class="popular-badge">Popular</div>' : ''}
+        ${tool.popular ? '<div class="popular-badge" title="Popular Tool"></div>' : ''}
       </a>
     `;
   },
@@ -466,31 +466,6 @@ window.SPAComponents = {
     const relatedTools = window.SPATools?.getRelatedTools(toolData.id) || [];
     
     return `
-      <div class="card">
-        <div class="card-header">
-          <div class="card-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="6" x2="12" y2="12"/>
-              <line x1="16" y1="10" x2="12" y2="12"/>
-            </svg>
-          </div>
-          <div>
-            <h3 class="card-title">About This Tool</h3>
-          </div>
-        </div>
-        <div class="space-y-3">
-          <p class="text-sm text-secondary">${toolData.description}</p>
-          <div class="flex justify-between text-sm">
-            <span class="text-secondary">Category:</span>
-            <a href="#/category/${toolData.category}" class="text-primary">${window.SPATools?.getCategoryById(toolData.category)?.name || toolData.category}</a>
-          </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-secondary">Privacy:</span>
-            <span class="text-success">Local Processing</span>
-          </div>
-        </div>
-      </div>
 
       ${relatedTools.length > 0 ? `
       <div class="card">

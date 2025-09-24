@@ -1,74 +1,53 @@
-const CACHE_NAME = 'devtools-hub-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json'
-];
+const CACHE_NAME = 'devtools-hub-disabled';
+const urlsToCache = [];
 
-// Install event - cache resources
+// Install event - skip caching for development
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Service Worker: Cache opened');
-        return cache.addAll(urlsToCache);
+  console.log('Service Worker: Caching disabled for development');
+  // Skip waiting to activate immediately
+  self.skipWaiting();
+});
+
+// Fetch event - bypass cache completely for development
+self.addEventListener('fetch', (event) => {
+  // Skip cross-origin requests
+  if (!event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
+  // Always fetch from network, no caching
+  event.respondWith(
+    fetch(event.request.clone())
+      .then((response) => {
+        console.log('Serving fresh from network:', event.request.url);
+        return response;
       })
       .catch((error) => {
-        console.log('Service Worker: Cache failed', error);
-      })
-  );
-});
-
-// Fetch event - serve from cache when offline
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        if (response) {
-          return response;
-        }
-
-        return fetch(event.request).then((response) => {
-          // Check if we received a valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
-          }
-
-          // Clone the response
-          const responseToCache = response.clone();
-
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-
-          return response;
+        console.warn('Network fetch failed:', event.request.url, error);
+        // Return a basic error response instead of cached fallback
+        return new Response('Network Error', { 
+          status: 503, 
+          statusText: 'Service Unavailable' 
         });
       })
-      .catch(() => {
-        // If both cache and network fail, return a fallback
-        if (event.request.destination === 'document') {
-          return caches.match('/index.html');
-        }
-      })
   );
 });
 
-// Activate event - clean up old caches
+// Activate event - clear all caches for development
 self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME];
+  console.log('Service Worker: Clearing all caches for development');
   
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            console.log('Service Worker: Deleting old cache', cacheName);
-            return caches.delete(cacheName);
-          }
+          console.log('Service Worker: Deleting cache', cacheName);
+          return caches.delete(cacheName);
         })
       );
+    }).then(() => {
+      // Take control of all clients immediately
+      return self.clients.claim();
     })
   );
 });
@@ -88,7 +67,7 @@ function doBackgroundSync() {
 // Push notifications (for future use)
 self.addEventListener('push', (event) => {
   const options = {
-    body: event.data ? event.data.text() : 'DevTools Hub notification',
+    body: event.data ? event.data.text() : 'Development Station notification',
     icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🛠️</text></svg>',
     badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🛠️</text></svg>',
     vibrate: [100, 50, 100],
@@ -99,7 +78,7 @@ self.addEventListener('push', (event) => {
     actions: [
       {
         action: 'explore',
-        title: 'Open DevTools Hub',
+        title: 'Open Development Station',
         icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🛠️</text></svg>'
       },
       {
@@ -111,7 +90,7 @@ self.addEventListener('push', (event) => {
   };
   
   event.waitUntil(
-    self.registration.showNotification('DevTools Hub', options)
+    self.registration.showNotification('Development Station', options)
   );
 });
 
