@@ -1,6 +1,7 @@
 /* SPA-specific styles for Development Station */
 
-/* Loading Screen */
+/* Loading Screen - Removed for Performance */
+/* Keeping styles commented in case needed for future use
 .loading-screen {
   position: fixed;
   top: 0;
@@ -62,6 +63,7 @@
   opacity: 0.9;
   animation: pulse 2s infinite;
 }
+*/
 
 /* Page Transitions */
 .page-transition {
@@ -580,9 +582,11 @@
 }
 
 /* Dark mode enhancements */
+/* Loading screen styles removed for performance
 [data-theme="dark"] .loading-screen {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
 }
+*/
 
 [data-theme="dark"] .hero-enhanced {
   background: linear-gradient(135deg, var(--color-gray-900) 0%, var(--color-gray-800) 100%);
@@ -594,7 +598,7 @@
 
 /* Accessibility enhancements */
 @media (prefers-reduced-motion: reduce) {
-  .loading-screen,
+  /* .loading-screen, - removed for performance */
   .page-transition,
   .tool-card-enhanced,
   .category-card-enhanced,
@@ -602,6 +606,7 @@
     transition: none;
   }
   
+  /* Loading animations removed for performance
   .loading-logo .logo-icon,
   .loading-spinner {
     animation: none;

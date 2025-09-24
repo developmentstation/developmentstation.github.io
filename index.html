@@ -246,17 +246,7 @@
     </script>
 </head>
 <body data-theme="light">
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="loading-screen">
-        <div class="loading-content">
-            <div class="loading-logo">
-                <span class="logo-icon">🛠️</span>
-                <span class="logo-text">Development Station</span>
-            </div>
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Loading tools...</p>
-        </div>
-    </div>
+    <!-- Loading Screen Removed for Performance -->
 
     <!-- Header -->
     <header class="header" id="app-header">
@@ -389,19 +379,16 @@
                         </div>
                     </div>
                 `;
-                // Hide loading screen
-                const loadingScreen = document.getElementById('loading-screen');
-                if (loadingScreen) loadingScreen.style.display = 'none';
             }
         });
 
         // Fallback timeout - if SPA doesn't load in 10 seconds
         setTimeout(function() {
-            const loadingScreen = document.getElementById('loading-screen');
-            if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
+            // Check if main content is still empty
+            const mainContent = document.getElementById('main-content');
+            if (mainContent && !mainContent.innerHTML.trim()) {
                 console.warn('SPA loading timeout - showing fallback');
-                loadingScreen.style.display = 'none';
-                document.getElementById('main-content').innerHTML = `
+                mainContent.innerHTML = `
                     <div class="container">
                         <div class="error-container text-center" style="padding: 4rem 2rem;">
                             <div style="font-size: 4rem; margin-bottom: 2rem;">⏰</div>

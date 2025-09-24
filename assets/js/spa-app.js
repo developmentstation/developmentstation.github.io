@@ -44,10 +44,8 @@ class SPAApp {
       // Initialize service worker for PWA
       this.initializeServiceWorker();
       
-      // Hide loading screen after a short delay
-      setTimeout(() => {
-        this.hideLoadingScreen();
-      }, 1000);
+      // Loading screen removed - content loads immediately
+      this.hideLoadingScreen();
       
       this.isInitialized = true;
       
@@ -104,38 +102,31 @@ class SPAApp {
   }
 
   showLoadingScreen() {
-    const loadingScreen = document.getElementById('loading-screen');
-    if (loadingScreen) {
-      loadingScreen.classList.remove('hidden');
-    }
+    // Loading screen removed for performance
+    // Content loads directly without splash screen
   }
 
   hideLoadingScreen() {
-    const loadingScreen = document.getElementById('loading-screen');
-    if (loadingScreen) {
-      loadingScreen.classList.add('hidden');
-      // Remove from DOM after animation
-      setTimeout(() => {
-        if (loadingScreen.parentNode) {
-          loadingScreen.parentNode.removeChild(loadingScreen);
-        }
-      }, 500);
-    }
+    // Loading screen removed for performance
+    // No action needed
   }
 
   handleInitializationError(error) {
-    const loadingScreen = document.getElementById('loading-screen');
-    if (loadingScreen) {
-      loadingScreen.innerHTML = `
-        <div class="loading-content">
-          <div class="loading-logo">
-            <span class="logo-icon">⚠️</span>
-            <span class="logo-text">Error</span>
+    // Display error directly in main content
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+      mainContent.innerHTML = `
+        <div class="container">
+          <div class="error-container text-center" style="padding: 4rem 2rem;">
+            <div style="font-size: 4rem; margin-bottom: 2rem;">⚠️</div>
+            <h2>Loading Error</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+              Failed to load Development Station. ${error.message || ''}
+            </p>
+            <button class="btn btn-primary" onclick="location.reload()">
+              Reload Page
+            </button>
           </div>
-          <p class="loading-text">Failed to load Development Station</p>
-          <button class="btn btn-primary" onclick="location.reload()" style="margin-top: 1rem;">
-            Reload Page
-          </button>
         </div>
       `;
     }
