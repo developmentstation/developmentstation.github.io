@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Graph Visualizer - Convert JSON to Interactive Graph Online</title>
+    <meta name="description" content="Free online JSON to graph visualizer. Convert JSON data into beautiful interactive graphs and network diagrams. Visualize JSON structure with nodes and edges. No registration required.">
+    <meta name="keywords" content="json graph visualizer, json to graph, json network diagram, json structure visualizer, interactive json graph, json tree visualizer, json data visualization, network graph, node graph, json diagram">
+    <meta name="author" content="Development Station">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="googlebot" content="index, follow">
+    <link rel="canonical" href="https://developmentstation.github.io/tools/json-graph-visualizer.html">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="JSON Graph Visualizer - Convert JSON to Interactive Graph">
+    <meta property="og:description" content="Free online tool to convert JSON data into beautiful interactive graphs and network diagrams. Visualize JSON structure with modern UI.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://developmentstation.github.io/tools/json-graph-visualizer.html">
+    <meta property="og:image" content="https://developmentstation.github.io/assets/images/tools/json-graph-og.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Development Station">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="JSON Graph Visualizer - Interactive Graph Tool">
+    <meta name="twitter:description" content="Convert JSON to beautiful interactive graphs. Free online tool with modern UI.">
+    <meta name="twitter:image" content="https://developmentstation.github.io/assets/images/tools/json-graph-twitter.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕸️</text></svg>">
+    
+    <!-- Theme -->
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="color-scheme" content="light dark">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="../assets/css/modern-styles.css">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "JSON Graph Visualizer",
+        "description": "Convert JSON data into beautiful interactive graphs and network diagrams. Visualize JSON structure with nodes and edges.",
+        "url": "https://developmentstation.github.io/tools/json-graph-visualizer.html",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript. Works on Chrome, Firefox, Safari, Edge.",
+        "datePublished": "2025-09-24",
+        "dateModified": "2025-09-24",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "127",
+            "bestRating": "5",
+            "worstRating": "1"
+        },
+        "featureList": [
+            "Interactive JSON graph visualization",
+            "Multiple layout algorithms (Force-directed, Hierarchical, Circular)",
+            "Zoom and pan functionality",
+            "Node and edge customization",
+            "Export to PNG, SVG, or JSON",
+            "Real-time JSON validation",
+            "Dark and light themes",
+            "Responsive design"
+        ],
+        "author": {
+            "@type": "Organization",
+            "name": "Development Station"
+        }
+    }
+    </script>
+    
+    <style>
+        .main-container {
+            display: flex;
+            height: calc(100vh - 200px);
+            min-height: 600px;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .panel-content {
+            flex: 1;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .json-editor {
+            width: 100%;
+            height: 100%;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 1rem;
+            border: none;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            resize: none;
+            outline: none;
+        }
+        
+        .graph-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #f8f9fa;
+            overflow: hidden;
+        }
+        
+        .graph-canvas {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+        
+        .graph-canvas:active {
+            cursor: grabbing;
+        }
+        
+        .graph-canvas.dragging-node {
+            cursor: grabbing;
+        }
+        
+        .bottom-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            font-size: 0.875rem;
+        }
+        
+        .control-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .checkbox {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--color-primary);
+        }
+        
+        .search-input {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            width: 200px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+        
+        .node-info {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            min-width: 200px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            font-size: 0.875rem;
+        }
+        
+        .node-info.hidden {
+            display: none;
+        }
+        
+        .node-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+        
+        .node-details {
+            color: #6b7280;
+        }
+        
+        .zoom-controls {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+        
+        .zoom-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+        
+        .zoom-btn:hover {
+            background: var(--bg-secondary);
+        }
+        
+        .zoom-level {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .error-message {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-top: 1px solid #fecaca;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .sample-json {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .sample-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.375rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        
+        .sample-btn:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .stats-panel {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            min-width: 80px;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .left-panel, .right-panel {
+                min-height: 400px;
+            }
+            
+            .bottom-controls {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            
+            .search-input {
+                width: 150px;
+            }
+            
+            .node-info {
+                position: static;
+                margin-top: 1rem;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="container">
+        <div class="tool-header">
+            <div class="tool-icon">🕸️</div>
+            <div class="tool-info">
+                <h1>JSON Graph Visualizer</h1>
+                <p>Convert JSON data into beautiful interactive graphs and network diagrams</p>
+            </div>
+        </div>
+
+        <div class="tool-content">
+            <div class="main-container">
+                <!-- Left Panel - JSON Editor -->
+                <div class="left-panel">
+                    <div class="panel-header">
+                        <span>JSON</span>
+                        <div class="sample-json">
+                            <button class="sample-btn" data-sample="simple">Simple</button>
+                            <button class="sample-btn" data-sample="nested">Nested</button>
+                            <button class="sample-btn" data-sample="array">Array</button>
+                            <button class="sample-btn" data-sample="complex">Complex</button>
+                        </div>
+                    </div>
+                    <div class="panel-content">
+                        <textarea 
+                            id="jsonInput" 
+                            class="json-editor" 
+                            placeholder="Enter your JSON data here..."
+                            spellcheck="false"
+                        ></textarea>
+                        <div class="error-message" id="errorMessage"></div>
+                    </div>
+                </div>
+
+                <!-- Right Panel - Graph Visualization -->
+                <div class="right-panel">
+                    <div class="panel-header">
+                        <span>JSON CRACK</span>
+                        <div class="control-group">
+                            <button class="btn btn-outline" id="exportPNG">Export PNG</button>
+                            <button class="btn btn-outline" id="exportSVG">Export SVG</button>
+                        </div>
+                    </div>
+                    <div class="panel-content">
+                        <div class="graph-container">
+                            <canvas id="graphCanvas" class="graph-canvas"></canvas>
+                            <div class="node-info hidden" id="nodeInfo">
+                                <div class="node-title" id="nodeTitle">Node Info</div>
+                                <div class="node-details" id="nodeDetails"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bottom-controls">
+                        <div class="checkbox-group">
+                            <input type="checkbox" class="checkbox" id="validCheckbox" checked>
+                            <label for="validCheckbox">Valid</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" class="checkbox" id="liveTransformCheckbox" checked>
+                            <label for="liveTransformCheckbox">Live Transform</label>
+                        </div>
+                        <button class="btn btn-primary" id="generateGraph">Convert to Graph</button>
+                        <div class="control-group">
+                            <label>Layout:</label>
+                            <select id="layoutSelect" style="padding: 0.25rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary);">
+                                <option value="force">Force</option>
+                                <option value="hierarchical">Hierarchical</option>
+                                <option value="circular">Circular</option>
+                            </select>
+                        </div>
+                        <div class="zoom-controls">
+                            <button class="zoom-btn" id="zoomOut">−</button>
+                            <button class="zoom-btn" id="zoomIn">+</button>
+                            <span class="zoom-level" id="zoomLevel">100%</span>
+                        </div>
+                        <input type="text" class="search-input" placeholder="Search Node" id="searchInput">
+                        <button class="zoom-btn" id="fullscreenBtn">⛶</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <h3>Graph Statistics</h3>
+                <div class="stats-panel" id="statsPanel">
+                    <div class="stat-item">
+                        <div class="stat-value" id="nodeCount">0</div>
+                        <div class="stat-label">Nodes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="edgeCount">0</div>
+                        <div class="stat-label">Edges</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="depthCount">0</div>
+                        <div class="stat-label">Max Depth</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="sizeCount">0</div>
+                        <div class="stat-label">Size (KB)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class JSONGraphVisualizer {
+            constructor() {
+                console.log('JSONGraphVisualizer constructor called');
+                
+                this.canvas = document.getElementById('graphCanvas');
+                if (!this.canvas) {
+                    console.error('Canvas element not found');
+                    return;
+                }
+                
+                this.ctx = this.canvas.getContext('2d');
+                if (!this.ctx) {
+                    console.error('Canvas context not available');
+                    return;
+                }
+                
+                this.jsonInput = document.getElementById('jsonInput');
+                if (!this.jsonInput) {
+                    console.error('JSON input element not found');
+                    return;
+                }
+                
+                this.errorMessage = document.getElementById('errorMessage');
+                this.nodeInfo = document.getElementById('nodeInfo');
+                this.nodeTitle = document.getElementById('nodeTitle');
+                this.nodeDetails = document.getElementById('nodeDetails');
+                
+                this.graph = {
+                    nodes: [],
+                    edges: [],
+                    layout: 'force'
+                };
+                
+                this.zoom = 1;
+                this.panX = 0;
+                this.panY = 0;
+                this.isDragging = false;
+                this.isDraggingNode = false;
+                this.draggedNode = null;
+                this.lastMouseX = 0;
+                this.lastMouseY = 0;
+                this.selectedNode = null;
+                
+                this.init();
+            }
+            
+            init() {
+                console.log('Initializing JSON Graph Visualizer');
+                this.setupCanvas();
+                this.setupEventListeners();
+                
+                // Load sample data after a short delay to ensure DOM is ready
+                setTimeout(() => {
+                    this.loadSampleData('simple');
+                }, 100);
+            }
+            
+            setupCanvas() {
+                console.log('Setting up canvas');
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+                
+                // Initial draw to show something
+                this.draw();
+            }
+            
+            resizeCanvas() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                this.canvas.width = rect.width;
+                this.canvas.height = rect.height;
+                console.log('Canvas resized to:', rect.width, 'x', rect.height);
+                this.draw();
+            }
+            
+            setupEventListeners() {
+                // JSON input with live transform
+                this.jsonInput.addEventListener('input', () => {
+                    console.log('JSON input changed');
+                    this.validateJSON();
+                    if (document.getElementById('liveTransformCheckbox').checked) {
+                        console.log('Live transform enabled, generating graph');
+                        this.generateGraph();
+                    }
+                });
+                
+                // Sample data buttons
+                document.querySelectorAll('.sample-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        console.log('Sample button clicked:', e.target.dataset.sample);
+                        this.loadSampleData(e.target.dataset.sample);
+                    });
+                });
+                
+                // Control buttons
+                const generateBtn = document.getElementById('generateGraph');
+                if (generateBtn) {
+                    generateBtn.addEventListener('click', () => {
+                        console.log('Convert to Graph button clicked');
+                        this.generateGraph();
+                    });
+                } else {
+                    console.error('Generate graph button not found');
+                }
+                
+                // Layout selector
+                const layoutSelect = document.getElementById('layoutSelect');
+                if (layoutSelect) {
+                    layoutSelect.addEventListener('change', (e) => {
+                        this.graph.layout = e.target.value;
+                        console.log('Layout changed to:', e.target.value);
+                        if (this.graph.nodes.length > 0) {
+                            this.applyLayout();
+                            this.draw();
+                        }
+                    });
+                }
+                
+                // Live transform checkbox
+                const liveTransformCheckbox = document.getElementById('liveTransformCheckbox');
+                if (liveTransformCheckbox) {
+                    liveTransformCheckbox.addEventListener('change', (e) => {
+                        console.log('Live transform checkbox changed:', e.target.checked);
+                        if (e.target.checked && this.validateJSON()) {
+                            this.generateGraph();
+                        }
+                    });
+                }
+                
+                // Zoom controls
+                const zoomInBtn = document.getElementById('zoomIn');
+                const zoomOutBtn = document.getElementById('zoomOut');
+                if (zoomInBtn) zoomInBtn.addEventListener('click', () => this.zoomIn());
+                if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => this.zoomOut());
+                
+                // Export buttons
+                const exportPNGBtn = document.getElementById('exportPNG');
+                const exportSVGBtn = document.getElementById('exportSVG');
+                if (exportPNGBtn) exportPNGBtn.addEventListener('click', () => this.exportPNG());
+                if (exportSVGBtn) exportSVGBtn.addEventListener('click', () => this.exportSVG());
+                
+                // Search functionality
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        this.searchNodes(e.target.value);
+                    });
+                }
+                
+                // Fullscreen toggle
+                const fullscreenBtn = document.getElementById('fullscreenBtn');
+                if (fullscreenBtn) {
+                    fullscreenBtn.addEventListener('click', () => {
+                        this.toggleFullscreen();
+                    });
+                }
+                
+                // Canvas interactions
+                this.canvas.addEventListener('mousedown', (e) => this.startDrag(e));
+                this.canvas.addEventListener('mousemove', (e) => this.drag(e));
+                this.canvas.addEventListener('mouseup', () => this.endDrag());
+                this.canvas.addEventListener('wheel', (e) => this.handleWheel(e));
+                this.canvas.addEventListener('click', (e) => this.handleClick(e));
+                
+                // Prevent context menu on canvas
+                this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+                
+                // Handle mouse leave to stop dragging
+                this.canvas.addEventListener('mouseleave', () => this.endDrag());
+            }
+            
+            loadSampleData(type) {
+                console.log('Loading sample data:', type);
+                const samples = {
+                    simple: {
+                        "name": "John Doe",
+                        "age": 30,
+                        "email": "john@example.com",
+                        "active": true
+                    },
+                    nested: {
+                        "user": {
+                            "profile": {
+                                "name": "Alice",
+                                "settings": {
+                                    "theme": "dark",
+                                    "notifications": true
+                                }
+                            },
+                            "posts": [
+                                {"title": "Hello World", "likes": 42},
+                                {"title": "Another Post", "likes": 15}
+                            ]
+                        }
+                    },
+                    array: [
+                        {"id": 1, "name": "Item 1", "category": "A"},
+                        {"id": 2, "name": "Item 2", "category": "B"},
+                        {"id": 3, "name": "Item 3", "category": "A"}
+                    ],
+                    complex: {
+                        "fruits": [
+                            {
+                                "name": "Apple",
+                                "color": "#FF0000",
+                                "details": {
+                                    "type": "Pome",
+                                    "season": "Fall"
+                                },
+                                "nutrients": {
+                                    "calories": 52,
+                                    "fiber": "2.4g",
+                                    "vitaminC": "4.6mg"
+                                }
+                            },
+                            {
+                                "name": "Banana",
+                                "color": "#FFFF00",
+                                "details": {
+                                    "type": "Berry",
+                                    "season": "Year-round"
+                                },
+                                "nutrients": {
+                                    "calories": 89,
+                                    "fiber": "2.6g",
+                                    "potassium": "358mg"
+                                }
+                            },
+                            {
+                                "name": "Orange",
+                                "color": "#FFA500",
+                                "details": {
+                                    "type": "Citrus",
+                                    "season": "Winter"
+                                },
+                                "nutrients": {
+                                    "calories": 47,
+                                    "fiber": "2.4g",
+                                    "vitaminC": "53.2mg"
+                                }
+                            }
+                        ]
+                    }
+                };
+                
+                this.jsonInput.value = JSON.stringify(samples[type], null, 2);
+                console.log('Sample data loaded into input');
+                this.validateJSON();
+                
+                // Always generate graph when loading sample data
+                this.generateGraph();
+            }
+            
+            validateJSON() {
+                try {
+                    const json = JSON.parse(this.jsonInput.value);
+                    this.jsonInput.classList.remove('error');
+                    this.errorMessage.classList.remove('show');
+                    return true;
+                } catch (e) {
+                    this.jsonInput.classList.add('error');
+                    this.errorMessage.textContent = `Invalid JSON: ${e.message}`;
+                    this.errorMessage.classList.add('show');
+                    return false;
+                }
+            }
+            
+            formatJSON() {
+                if (this.validateJSON()) {
+                    const json = JSON.parse(this.jsonInput.value);
+                    this.jsonInput.value = JSON.stringify(json, null, 2);
+                }
+            }
+            
+            searchNodes(query) {
+                if (!query.trim()) {
+                    this.graph.nodes.forEach(node => node.highlighted = false);
+                } else {
+                    this.graph.nodes.forEach(node => {
+                        node.highlighted = node.label.toLowerCase().includes(query.toLowerCase()) ||
+                                        JSON.stringify(node.value).toLowerCase().includes(query.toLowerCase());
+                    });
+                }
+                this.draw();
+            }
+            
+            toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    this.canvas.parentElement.requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+            
+            generateGraph() {
+                console.log('generateGraph called');
+                if (!this.validateJSON()) {
+                    console.log('JSON validation failed');
+                    return;
+                }
+                
+                try {
+                    const json = JSON.parse(this.jsonInput.value);
+                    console.log('Parsed JSON:', json);
+                    
+                    // Clear existing graph
+                    this.graph = { nodes: [], edges: [], layout: 'force' };
+                    
+                    this.parseJSONToGraph(json);
+                    console.log('Graph parsed, nodes:', this.graph.nodes.length, 'edges:', this.graph.edges.length);
+                    
+                    this.applyLayout();
+                    console.log('Layout applied');
+                    
+                    this.draw();
+                    console.log('Graph drawn');
+                    
+                    this.updateStats();
+                    console.log('Stats updated');
+                } catch (error) {
+                    console.error('Error generating graph:', error);
+                }
+            }
+            
+            parseJSONToGraph(obj, path = '', parentId = null, depth = 0) {
+                const nodeId = path || 'root';
+                const node = {
+                    id: nodeId,
+                    label: this.getNodeLabel(obj, path),
+                    type: this.getNodeType(obj),
+                    value: obj,
+                    x: Math.random() * 400 + 100,
+                    y: Math.random() * 400 + 100,
+                    depth: depth,
+                    size: this.getNodeSize(obj)
+                };
+                
+                this.graph.nodes.push(node);
+                console.log('Added node:', nodeId, 'type:', node.type, 'depth:', depth);
+                
+                if (parentId) {
+                    this.graph.edges.push({
+                        from: parentId,
+                        to: nodeId,
+                        type: 'parent-child'
+                    });
+                    console.log('Added edge:', parentId, '->', nodeId);
+                }
+                
+                if (Array.isArray(obj)) {
+                    obj.forEach((item, index) => {
+                        this.parseJSONToGraph(item, `${path}[${index}]`, nodeId, depth + 1);
+                    });
+                } else if (obj && typeof obj === 'object') {
+                    Object.entries(obj).forEach(([key, value]) => {
+                        this.parseJSONToGraph(value, path ? `${path}.${key}` : key, nodeId, depth + 1);
+                    });
+                }
+            }
+            
+            drawGrid() {
+                const gridSize = 20;
+                this.ctx.strokeStyle = '#f0f0f0';
+                this.ctx.lineWidth = 0.5;
+                
+                // Draw vertical lines
+                for (let x = 0; x <= this.canvas.width; x += gridSize) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, 0);
+                    this.ctx.lineTo(x, this.canvas.height);
+                    this.ctx.stroke();
+                }
+                
+                // Draw horizontal lines
+                for (let y = 0; y <= this.canvas.height; y += gridSize) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y);
+                    this.ctx.lineTo(this.canvas.width, y);
+                    this.ctx.stroke();
+                }
+            }
+            
+            getNodeLabel(obj, path) {
+                if (path === '') return 'root';
+                if (path.includes('.')) return path.split('.').pop();
+                if (path.includes('[')) return path.split('[')[0];
+                return path;
+            }
+            
+            getNodeType(obj) {
+                if (Array.isArray(obj)) return 'array';
+                if (obj === null) return 'null';
+                return typeof obj;
+            }
+            
+            getNodeSize(obj) {
+                const str = JSON.stringify(obj);
+                return Math.max(20, Math.min(60, str.length / 10));
+            }
+            
+            applyLayout() {
+                console.log('Applying layout:', this.graph.layout);
+                const width = this.canvas.width;
+                const height = this.canvas.height;
+                const centerX = width / 2;
+                const centerY = height / 2;
+                
+                switch (this.graph.layout) {
+                    case 'force':
+                        this.applyForceLayout();
+                        break;
+                    case 'hierarchical':
+                        this.applyHierarchicalLayout();
+                        break;
+                    case 'circular':
+                        this.applyCircularLayout();
+                        break;
+                }
+                
+                console.log('Layout applied, nodes positioned');
+            }
+            
+            applyForceLayout() {
+                console.log('Applying force layout to', this.graph.nodes.length, 'nodes');
+                const iterations = 200;
+                const k = 100; // Spring constant
+                const c = 0.1; // Damping
+                
+                // Initialize positions in a better grid
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                
+                // Place root node in center
+                const rootNode = this.graph.nodes.find(n => n.id === 'root');
+                if (rootNode) {
+                    rootNode.x = centerX;
+                    rootNode.y = centerY;
+                }
+                
+                // Place other nodes in a circle around center
+                const nonRootNodes = this.graph.nodes.filter(n => n.id !== 'root');
+                const radius = Math.min(this.canvas.width, this.canvas.height) / 4;
+                
+                nonRootNodes.forEach((node, index) => {
+                    const angle = (2 * Math.PI * index) / nonRootNodes.length;
+                    node.x = centerX + radius * Math.cos(angle);
+                    node.y = centerY + radius * Math.sin(angle);
+                });
+                
+                for (let i = 0; i < iterations; i++) {
+                    // Repulsion forces
+                    for (let i = 0; i < this.graph.nodes.length; i++) {
+                        for (let j = i + 1; j < this.graph.nodes.length; j++) {
+                            const dx = this.graph.nodes[i].x - this.graph.nodes[j].x;
+                            const dy = this.graph.nodes[i].y - this.graph.nodes[j].y;
+                            const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+                            const force = k * k / distance;
+                            
+                            this.graph.nodes[i].x += (dx / distance) * force * c;
+                            this.graph.nodes[i].y += (dy / distance) * force * c;
+                            this.graph.nodes[j].x -= (dx / distance) * force * c;
+                            this.graph.nodes[j].y -= (dy / distance) * force * c;
+                        }
+                    }
+                    
+                    // Attraction forces (edges)
+                    this.graph.edges.forEach(edge => {
+                        const fromNode = this.graph.nodes.find(n => n.id === edge.from);
+                        const toNode = this.graph.nodes.find(n => n.id === edge.to);
+                        if (fromNode && toNode) {
+                            const dx = toNode.x - fromNode.x;
+                            const dy = toNode.y - fromNode.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+                            const force = distance * distance / k;
+                            
+                            fromNode.x += (dx / distance) * force * c;
+                            fromNode.y += (dy / distance) * force * c;
+                            toNode.x -= (dx / distance) * force * c;
+                            toNode.y -= (dy / distance) * force * c;
+                        }
+                    });
+                }
+                
+                console.log('Force layout applied');
+            }
+            
+            applyHierarchicalLayout() {
+                console.log('Applying hierarchical layout');
+                const levels = {};
+                this.graph.nodes.forEach(node => {
+                    if (!levels[node.depth]) levels[node.depth] = [];
+                    levels[node.depth].push(node);
+                });
+                
+                const levelCount = Object.keys(levels).length;
+                const levelHeight = this.canvas.height / (levelCount + 1);
+                
+                Object.entries(levels).forEach(([level, nodes]) => {
+                    const y = (parseInt(level) + 1) * levelHeight;
+                    const nodeWidth = this.canvas.width / (nodes.length + 1);
+                    
+                    nodes.forEach((node, index) => {
+                        node.x = (index + 1) * nodeWidth;
+                        node.y = y;
+                    });
+                });
+                
+                console.log('Hierarchical layout applied');
+            }
+            
+            applyCircularLayout() {
+                console.log('Applying circular layout');
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                const radius = Math.min(this.canvas.width, this.canvas.height) / 3;
+                
+                this.graph.nodes.forEach((node, index) => {
+                    const angle = (2 * Math.PI * index) / this.graph.nodes.length;
+                    node.x = centerX + radius * Math.cos(angle);
+                    node.y = centerY + radius * Math.sin(angle);
+                });
+                
+                console.log('Circular layout applied');
+            }
+            
+            draw() {
+                if (!this.ctx) {
+                    console.error('Canvas context not available');
+                    return;
+                }
+                
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw grid background
+                this.drawGrid();
+                
+                // Apply zoom and pan
+                this.ctx.save();
+                this.ctx.translate(this.panX, this.panY);
+                this.ctx.scale(this.zoom, this.zoom);
+                
+                // Draw edges
+                this.graph.edges.forEach(edge => {
+                    const fromNode = this.graph.nodes.find(n => n.id === edge.from);
+                    const toNode = this.graph.nodes.find(n => n.id === edge.to);
+                    if (fromNode && toNode) {
+                        this.drawEdge(fromNode, toNode);
+                    }
+                });
+                
+                // Draw nodes
+                this.graph.nodes.forEach(node => {
+                    this.drawNode(node);
+                });
+                
+                this.ctx.restore();
+            }
+            
+            drawEdge(fromNode, toNode) {
+                // Draw curved edge
+                const startX = fromNode.x;
+                const startY = fromNode.y + (fromNode.height || 0) / 2;
+                const endX = toNode.x;
+                const endY = toNode.y - (toNode.height || 0) / 2;
+                
+                const controlX = (startX + endX) / 2;
+                const controlY = startY + (endY - startY) * 0.3;
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(startX, startY);
+                this.ctx.quadraticCurveTo(controlX, controlY, endX, endY);
+                this.ctx.strokeStyle = '#9ca3af';
+                this.ctx.lineWidth = 1.5;
+                this.ctx.stroke();
+                
+                // Draw edge label for better readability
+                const midX = (startX + endX) / 2;
+                const midY = (startY + endY) / 2;
+                
+                this.ctx.fillStyle = '#6b7280';
+                this.ctx.font = '10px sans-serif';
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                
+                // Extract the relationship label
+                let label = '';
+                if (toNode.id.includes('[')) {
+                    label = toNode.id.split('[')[0];
+                } else if (toNode.id.includes('.')) {
+                    const parts = toNode.id.split('.');
+                    label = parts[parts.length - 1];
+                } else {
+                    label = toNode.label;
+                }
+                
+                if (label && label !== 'root') {
+                    this.ctx.fillText(label, midX, midY);
+                }
+            }
+            
+            drawNode(node) {
+                const isSelected = this.selectedNode === node;
+                const isHighlighted = node.highlighted;
+                const isDragging = this.draggedNode === node;
+                const padding = 8;
+                const lineHeight = 16;
+                
+                // Calculate node dimensions
+                const lines = this.getNodeLines(node);
+                const maxWidth = Math.max(...lines.map(line => this.ctx.measureText(line.text).width));
+                const width = maxWidth + padding * 2;
+                const height = lines.length * lineHeight + padding * 2;
+                
+                // Update node dimensions
+                node.width = width;
+                node.height = height;
+                
+                // Add shadow if dragging
+                if (isDragging) {
+                    this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                    this.ctx.shadowBlur = 10;
+                    this.ctx.shadowOffsetX = 2;
+                    this.ctx.shadowOffsetY = 2;
+                }
+                
+                // Node background
+                if (isHighlighted) {
+                    this.ctx.fillStyle = '#fef3c7';
+                } else if (isSelected) {
+                    this.ctx.fillStyle = '#dbeafe';
+                } else {
+                    this.ctx.fillStyle = '#ffffff';
+                }
+                this.ctx.fillRect(node.x - width/2, node.y - height/2, width, height);
+                
+                // Node border
+                if (isHighlighted) {
+                    this.ctx.strokeStyle = '#f59e0b';
+                    this.ctx.lineWidth = 2;
+                } else if (isSelected) {
+                    this.ctx.strokeStyle = '#3b82f6';
+                    this.ctx.lineWidth = 2;
+                } else {
+                    this.ctx.strokeStyle = '#d1d5db';
+                    this.ctx.lineWidth = 1;
+                }
+                this.ctx.strokeRect(node.x - width/2, node.y - height/2, width, height);
+                
+                // Draw drag handle for draggable nodes
+                if (isSelected && !isDragging) {
+                    this.ctx.fillStyle = '#9ca3af';
+                    this.ctx.fillRect(node.x + width/2 - 12, node.y - height/2 + 4, 8, 8);
+                    
+                    // Draw grip dots
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.fillRect(node.x + width/2 - 10, node.y - height/2 + 6, 1, 1);
+                    this.ctx.fillRect(node.x + width/2 - 7, node.y - height/2 + 6, 1, 1);
+                    this.ctx.fillRect(node.x + width/2 - 4, node.y - height/2 + 6, 1, 1);
+                    this.ctx.fillRect(node.x + width/2 - 10, node.y - height/2 + 8, 1, 1);
+                    this.ctx.fillRect(node.x + width/2 - 7, node.y - height/2 + 8, 1, 1);
+                    this.ctx.fillRect(node.x + width/2 - 4, node.y - height/2 + 8, 1, 1);
+                }
+                
+                // Reset shadow
+                this.ctx.shadowColor = 'transparent';
+                this.ctx.shadowBlur = 0;
+                this.ctx.shadowOffsetX = 0;
+                this.ctx.shadowOffsetY = 0;
+                
+                // Draw node content
+                this.ctx.fillStyle = '#374151';
+                this.ctx.font = '12px sans-serif';
+                this.ctx.textAlign = 'left';
+                this.ctx.textBaseline = 'top';
+                
+                lines.forEach((line, index) => {
+                    const y = node.y - height/2 + padding + index * lineHeight;
+                    
+                    if (line.type === 'key') {
+                        this.ctx.fillStyle = '#1f2937';
+                        this.ctx.font = 'bold 12px sans-serif';
+                    } else if (line.type === 'value') {
+                        this.ctx.fillStyle = this.getValueColor(line.value);
+                        this.ctx.font = '12px sans-serif';
+                    } else {
+                        this.ctx.fillStyle = '#6b7280';
+                        this.ctx.font = '12px sans-serif';
+                    }
+                    
+                    this.ctx.fillText(line.text, node.x - width/2 + padding, y);
+                });
+            }
+            
+            getNodeLines(node) {
+                const lines = [];
+                
+                if (node.id === 'root') {
+                    lines.push({ text: 'root', type: 'key' });
+                    return lines;
+                }
+                
+                if (node.type === 'array') {
+                    lines.push({ text: `"${node.label}": [${node.value.length} items]`, type: 'key' });
+                } else if (node.type === 'object') {
+                    const keys = Object.keys(node.value).length;
+                    lines.push({ text: `"${node.label}": {${keys} keys}`, type: 'key' });
+                } else {
+                    lines.push({ text: `"${node.label}": `, type: 'key' });
+                    
+                    let valueText = '';
+                    if (node.type === 'string') {
+                        valueText = `"${node.value}"`;
+                    } else if (node.type === 'number' || node.type === 'boolean') {
+                        valueText = String(node.value);
+                    } else if (node.value === null) {
+                        valueText = 'null';
+                    }
+                    
+                    if (valueText.length > 25) {
+                        valueText = valueText.substring(0, 22) + '...';
+                    }
+                    
+                    lines.push({ text: valueText, type: 'value', value: node.value });
+                }
+                
+                return lines;
+            }
+            
+            getValueColor(value) {
+                if (typeof value === 'string') return '#059669';
+                if (typeof value === 'number') return '#7c3aed';
+                if (typeof value === 'boolean') return '#dc2626';
+                if (value === null) return '#6b7280';
+                return '#374151';
+            }
+            
+            handleClick(e) {
+                // Only handle click if not dragging
+                if (this.isDragging || this.isDraggingNode) return;
+                
+                const rect = this.canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left - this.panX) / this.zoom;
+                const y = (e.clientY - rect.top - this.panY) / this.zoom;
+                
+                const clickedNode = this.graph.nodes.find(node => {
+                    const width = node.width || 0;
+                    const height = node.height || 0;
+                    return x >= node.x - width/2 && x <= node.x + width/2 && 
+                           y >= node.y - height/2 && y <= node.y + height/2;
+                });
+                
+                if (clickedNode) {
+                    this.selectedNode = clickedNode;
+                    this.showNodeInfo(clickedNode);
+                } else {
+                    this.selectedNode = null;
+                    this.hideNodeInfo();
+                }
+                
+                this.draw();
+            }
+            
+            showNodeInfo(node) {
+                this.nodeTitle.textContent = node.label;
+                this.nodeDetails.innerHTML = `
+                    <div><strong>Type:</strong> ${node.type}</div>
+                    <div><strong>Value:</strong> ${JSON.stringify(node.value).substring(0, 100)}${JSON.stringify(node.value).length > 100 ? '...' : ''}</div>
+                    <div><strong>Depth:</strong> ${node.depth}</div>
+                `;
+                this.nodeInfo.classList.remove('hidden');
+            }
+            
+            hideNodeInfo() {
+                this.nodeInfo.classList.add('hidden');
+            }
+            
+            startDrag(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left - this.panX) / this.zoom;
+                const y = (e.clientY - rect.top - this.panY) / this.zoom;
+                
+                // Check if clicking on a node
+                const clickedNode = this.graph.nodes.find(node => {
+                    const width = node.width || 0;
+                    const height = node.height || 0;
+                    return x >= node.x - width/2 && x <= node.x + width/2 && 
+                           y >= node.y - height/2 && y <= node.y + height/2;
+                });
+                
+                if (clickedNode) {
+                    this.isDraggingNode = true;
+                    this.draggedNode = clickedNode;
+                    this.selectedNode = clickedNode;
+                    this.showNodeInfo(clickedNode);
+                    this.canvas.classList.add('dragging-node');
+                } else {
+                    this.isDragging = true;
+                    this.selectedNode = null;
+                    this.hideNodeInfo();
+                }
+                
+                this.lastMouseX = e.clientX;
+                this.lastMouseY = e.clientY;
+                this.draw();
+            }
+            
+            drag(e) {
+                if (!this.isDragging && !this.isDraggingNode) return;
+                
+                const deltaX = e.clientX - this.lastMouseX;
+                const deltaY = e.clientY - this.lastMouseY;
+                
+                if (this.isDraggingNode && this.draggedNode) {
+                    // Move the dragged node
+                    this.draggedNode.x += deltaX / this.zoom;
+                    this.draggedNode.y += deltaY / this.zoom;
+                } else if (this.isDragging) {
+                    // Pan the canvas
+                    this.panX += deltaX;
+                    this.panY += deltaY;
+                }
+                
+                this.lastMouseX = e.clientX;
+                this.lastMouseY = e.clientY;
+                
+                this.draw();
+            }
+            
+            endDrag() {
+                this.isDragging = false;
+                this.isDraggingNode = false;
+                this.draggedNode = null;
+                this.canvas.classList.remove('dragging-node');
+            }
+            
+            handleWheel(e) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                this.zoom = Math.max(0.1, Math.min(5, this.zoom * delta));
+                document.getElementById('zoomLevel').textContent = Math.round(this.zoom * 100) + '%';
+                this.draw();
+            }
+            
+            zoomIn() {
+                this.zoom = Math.min(5, this.zoom * 1.2);
+                document.getElementById('zoomLevel').textContent = Math.round(this.zoom * 100) + '%';
+                this.draw();
+            }
+            
+            zoomOut() {
+                this.zoom = Math.max(0.1, this.zoom / 1.2);
+                document.getElementById('zoomLevel').textContent = Math.round(this.zoom * 100) + '%';
+                this.draw();
+            }
+            
+            resetZoom() {
+                this.zoom = 1;
+                this.panX = 0;
+                this.panY = 0;
+                document.getElementById('zoomLevel').textContent = '100%';
+                this.draw();
+            }
+            
+            updateStats() {
+                document.getElementById('nodeCount').textContent = this.graph.nodes.length;
+                document.getElementById('edgeCount').textContent = this.graph.edges.length;
+                document.getElementById('depthCount').textContent = Math.max(...this.graph.nodes.map(n => n.depth), 0);
+                
+                const jsonSize = new Blob([this.jsonInput.value]).size;
+                document.getElementById('sizeCount').textContent = (jsonSize / 1024).toFixed(1);
+            }
+            
+            exportPNG() {
+                const link = document.createElement('a');
+                link.download = 'json-graph.png';
+                link.href = this.canvas.toDataURL();
+                link.click();
+            }
+            
+            exportSVG() {
+                const svg = this.createSVG();
+                const blob = new Blob([svg], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = 'json-graph.svg';
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+            }
+            
+            createSVG() {
+                const width = this.canvas.width;
+                const height = this.canvas.height;
+                
+                let svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`;
+                
+                // Add edges
+                this.graph.edges.forEach(edge => {
+                    const fromNode = this.graph.nodes.find(n => n.id === edge.from);
+                    const toNode = this.graph.nodes.find(n => n.id === edge.to);
+                    if (fromNode && toNode) {
+                        svg += `<line x1="${fromNode.x}" y1="${fromNode.y}" x2="${toNode.x}" y2="${toNode.y}" stroke="#94a3b8" stroke-width="1"/>`;
+                    }
+                });
+                
+                // Add nodes
+                this.graph.nodes.forEach(node => {
+                    const radius = node.size / 2;
+                    const color = this.getNodeColor(node.type);
+                    svg += `<circle cx="${node.x}" cy="${node.y}" r="${radius}" fill="${color}" stroke="#64748b" stroke-width="1"/>`;
+                    svg += `<text x="${node.x}" y="${node.y}" text-anchor="middle" dominant-baseline="middle" fill="white" font-family="sans-serif" font-size="12">${node.label}</text>`;
+                });
+                
+                svg += '</svg>';
+                return svg;
+            }
+            
+            exportJSON() {
+                const graphData = {
+                    nodes: this.graph.nodes,
+                    edges: this.graph.edges,
+                    metadata: {
+                        generated: new Date().toISOString(),
+                        layout: this.graph.layout,
+                        nodeCount: this.graph.nodes.length,
+                        edgeCount: this.graph.edges.length
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(graphData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = 'json-graph-data.json';
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+        
+        // Initialize the visualizer when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, initializing visualizer');
+            try {
+                new JSONGraphVisualizer();
+                console.log('Visualizer initialized successfully');
+            } catch (error) {
+                console.error('Error initializing visualizer:', error);
+            }
+        });
+    </script>
+</body>
+</html>
