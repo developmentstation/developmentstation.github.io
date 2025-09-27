@@ -24,67 +24,67 @@
   
   <!-- High Priority Developer Tools (Most Searched) -->
   <url>
-    <loc>https://developmentstation.github.io/tools/json-formatter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/json-formatter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/base64-encoder.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/base64-encoder</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/password-generator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/password-generator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/qr-generator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/qr-generator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/unix-timestamp-converter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/unix-timestamp-converter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/hash-generator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/hash-generator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/url-encoder.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/url-encoder</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/uuid-generator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/uuid-generator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/jwt-decoder.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/jwt-decoder</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/regex-tester.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/regex-tester</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/json-graph-visualizer.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/json-graph-visualizer</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -92,37 +92,37 @@
   
   <!-- Text Processing Tools -->
   <url>
-    <loc>https://developmentstation.github.io/tools/case-converter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/case-converter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/word-counter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/word-counter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/text-formatter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/text-formatter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/text-diff.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/text-diff</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/string-manipulator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/string-manipulator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/lorem-generator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/lorem-generator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
@@ -130,37 +130,37 @@
   
   <!-- Data Format Tools -->
   <url>
-    <loc>https://developmentstation.github.io/tools/csv-converter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/csv-converter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/xml-formatter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/xml-formatter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/yaml-converter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/yaml-converter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/sql-formatter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/sql-formatter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/markdown-to-html.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/markdown-to-html</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/html-to-markdown.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/html-to-markdown</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -168,43 +168,43 @@
   
   <!-- Web Development Tools -->
   <url>
-    <loc>https://developmentstation.github.io/tools/html-encoder.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/html-encoder</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/html-formatter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/html-formatter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/css-minifier.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/css-minifier</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/js-beautifier.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/js-beautifier</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/color-picker.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/color-picker</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/color-converter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/color-converter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/svg-optimizer.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/svg-optimizer</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -212,31 +212,31 @@
   
   <!-- SEO & Analytics Tools -->
   <url>
-    <loc>https://developmentstation.github.io/tools/seo-analyzer.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/seo-analyzer</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/meta-generator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/meta-generator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/url-analyzer.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/url-analyzer</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/favicon-generator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/favicon-generator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/performance-analyzer.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/performance-analyzer</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -244,25 +244,25 @@
   
   <!-- Security & Encryption Tools -->
   <url>
-    <loc>https://developmentstation.github.io/tools/aes-encrypt.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/aes-encrypt</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/rsa-keygen.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/rsa-keygen</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/hmac-generator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/hmac-generator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/totp-generator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/totp-generator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
@@ -270,55 +270,55 @@
   
   <!-- Network & System Tools -->
   <url>
-    <loc>https://developmentstation.github.io/tools/ip-info.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/ip-info</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/dns-lookup.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/dns-lookup</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/whois-lookup.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/whois-lookup</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/ssl-checker.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/ssl-checker</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/port-info.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/port-info</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/speed-test.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/speed-test</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/user-agent.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/user-agent</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/browser-info.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/browser-info</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/system-info.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/system-info</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
@@ -326,25 +326,25 @@
   
   <!-- Time & Date Tools -->
   <url>
-    <loc>https://developmentstation.github.io/tools/world-clock.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/world-clock</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/date-calculator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/date-calculator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/countdown-timer.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/countdown-timer</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/cron-builder.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/cron-builder</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -352,55 +352,55 @@
   
   <!-- Math & Number Tools -->
   <url>
-    <loc>https://developmentstation.github.io/tools/calculator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/calculator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/base-converter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/base-converter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/binary-encoder.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/binary-encoder</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/hex-encoder.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/hex-encoder</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/percentage-calculator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/percentage-calculator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/number-formatter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/number-formatter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/random-generator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/random-generator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/statistics.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/statistics</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/unit-converter.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/unit-converter</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -408,37 +408,37 @@
   
   <!-- Image Tools -->
   <url>
-    <loc>https://developmentstation.github.io/tools/image-base64.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/image-base64</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/image-resizer.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/image-resizer</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/image-info.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/image-info</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/image-formats.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/image-formats</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/placeholder-generator.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/placeholder-generator</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/color-extractor.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/color-extractor</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.65</priority>
@@ -446,31 +446,31 @@
   
   <!-- Utility Tools -->
   <url>
-    <loc>https://developmentstation.github.io/tools/validators.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/validators</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/mime-lookup.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/mime-lookup</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/notes.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/notes</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/clipboard.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/clipboard</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://developmentstation.github.io/tools/todo.html</loc>
+    <loc>https://developmentstation.github.io/#/tool/todo</loc>
     <lastmod>2025-09-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
